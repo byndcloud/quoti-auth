@@ -28,6 +28,9 @@ class QuotiAuth {
       this.getUserData = getUserData
     }
   }
+  getOrganizationalUserOrganizationPermissions (args) {
+    return Permissions.getOrganizationalUserOrganizationPermissions(args)
+  }
 
   validateSomePermissionCluster (args) {
     return Permissions.validateSomePermissionCluster(this.logger)(args)
