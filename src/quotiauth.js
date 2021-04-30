@@ -29,7 +29,7 @@ class QuotiAuth {
     }
   }
   getOrganizationalUserOrganizationPermissions (args) {
-    return Permissions.getOrganizationalUserOrganizationPermissions(args)
+    return Permissions.getOrganizationalUserOrganizationPermissions(this.logger)(args)
   }
 
   validateSomePermissionCluster (args) {
@@ -72,4 +72,4 @@ class QuotiAuth {
   }
 }
 
-module.exports = new QuotiAuth()
+exports.quotiAuth = new QuotiAuth()
