@@ -1,0 +1,23 @@
+{
+    "parser": "babel-eslint",
+    "extends": "standard",
+    "parserOptions": {
+      "sourceType": "module",
+      "allowImportExportEverywhere": false
+    },
+    "env": {
+      "mocha": true
+    },
+    "rules": {
+      "no-underscore-dangle": 0,
+      "class-methods-use-this": ["off"],
+      "no-use-before-define": ["error", { 
+        "functions": false, 
+        "classes": false 
+      }],
+      "no-unused-vars": ["warn"],
+      "arrow-parens": ["error", "as-needed", {
+        "requireForBlockBody": false
+      }]
+    }
+  }
