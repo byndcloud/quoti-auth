@@ -53,8 +53,9 @@ const getOrganizationalUserOrganizationPermissions = logger => {
  */
 function validateSomePermissionCluster (logger) {
   return (validators = []) => {
-    return (req, res) => {
+    return (req, res, next) => {
       if (!req.user) {
+        if (next) { next() }
         return null
       }
       logger.profile('MiddlewarePermissions', { level: 'verbose' })
@@ -66,6 +67,7 @@ function validateSomePermissionCluster (logger) {
       // Pass test if no permission required
       if (validators?.length === 0) {
         logger.info('User passed permission test')
+        if (next) { next() }
         return true
       }
 
@@ -128,6 +130,7 @@ function validateSomePermissionCluster (logger) {
       // If some validator were validated, pass test
       if (req.permissions.validated.length > 0) {
         logger.info('User passed permission test')
+        if (next) { next() }
         return true
       } else {
         const error = new Error(`Insufficient permissions! Permissions ${validators.join(', ')} are required`)
