@@ -43,7 +43,7 @@ app.post('/', QuotiAuth.middleware([['posts.filter']]), async (req, res) => {
 ```javascript
 const { quotiAuth } = require('quoti-auth')
 
-// Esta função será chamada passando o token do usuário que você está consultado para retornar os dados do usuário.
+// Esta função será chamada passando o token do usuário que você está consultando para retornar os dados do usuário.
 async getUserData (token) {
   const url = process.env['api_url'] || 'https://api.minhafaculdade.app/api/v1/'
   const headers = {
