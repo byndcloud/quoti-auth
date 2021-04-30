@@ -59,17 +59,17 @@ function validateSomePermissionCluster (logger) {
       }
       logger.profile('MiddlewarePermissions', { level: 'verbose' })
 
-      logger.log('Requiring access', { url: req.originalUrl })
+      logger.info('Requiring access', { url: req.originalUrl })
 
-      logger.log('Validators are', [validators])
+      logger.info('Validators are', [validators])
 
       // Pass test if no permission required
       if (validators?.length === 0) {
-        logger.log('User passed permission test')
+        logger.info('User passed permission test')
         return true
       }
 
-      logger.log('Getting users permissions')
+      logger.info('Getting users permissions')
 
       // Get user permissions
 
@@ -127,7 +127,7 @@ function validateSomePermissionCluster (logger) {
 
       // If some validator were validated, pass test
       if (req.permissions.validated.length > 0) {
-        logger.log('User passed permission test')
+        logger.info('User passed permission test')
         return true
       } else {
         const error = new Error(`Insufficient permissions! Permissions ${validators.join(', ')} are required`)
