@@ -65,7 +65,7 @@ function validateSomePermissionCluster (logger) {
       logger.info('Validators are', [validators])
 
       // Pass test if no permission required
-      if (validators?.length === 0) {
+      if (validators.length === 0) {
         logger.info('User passed permission test')
         if (next) { next() }
         return true

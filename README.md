@@ -25,7 +25,7 @@ quotiAuth.setup({
 Injetando dados do usuário em `req.user`:
 ```javascript
 app.post('/', QuotiAuth.middleware(), async (req, res) => {
-  console.log('User:', req.user?.name)
+  console.log('User:', req.user.name)
   res.send('OK!')
 })
 ```
@@ -52,7 +52,7 @@ async getUserData (token) {
   const { data } = await axios.post(`${url}${this.orgSlug}/auth/login/getuser`, { token }, { headers })
   
   // O retorno dessa função será injetado em req.user
-  return data?.user
+  return data.user
 }
 
 quotiAuth.setup({

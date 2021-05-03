@@ -17,7 +17,7 @@ class QuotiAuth {
       ApiKey: this.apiKey
     }
     const { data } = await axios.post(`${url}${this.orgSlug}/auth/login/getuser`, { token }, { headers })
-    return data?.user
+    return data.user
   }
 
   setup ({ orgSlug, apiKey, getUserData, logger }) {
@@ -45,13 +45,13 @@ class QuotiAuth {
   middleware (permissions = null) {
     return async (req, res, next) => {
       try {
-        if (!req?.body) {
+        if (!req.body) {
           throw new Error('You shold have a body parser in your express to parse the body of request.')
         }
-        if (!req?.body?.token) {
+        if (!req.body.token) {
           throw new Error('You shold have send a token in the body of request to search.')
         }
-        const token = req?.body?.token
+        const token = req.body.token
 
         const result = await this.getUserData(token)
         req.user = result
