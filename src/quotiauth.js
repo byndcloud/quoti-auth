@@ -28,12 +28,12 @@ class QuotiAuth {
       this.getUserData = getUserData
     }
   }
-  getOrganizationalUserOrganizationPermissions (args) {
-    return Permissions.getOrganizationalUserOrganizationPermissions(this.logger)(args)
+  getOrganizationalUserOrganizationPermissions (...args) {
+    return Permissions.getOrganizationalUserOrganizationPermissions(this.logger)(...args)
   }
 
-  validateSomePermissionCluster (args) {
-    return Permissions.validateSomePermissionCluster(this.logger)(args)
+  validateSomePermissionCluster (...args) {
+    return Permissions.validateSomePermissionCluster(this.logger)(...args)
   }
 
   /**
