@@ -48,13 +48,13 @@ class QuotiAuth {
         if (!req.body) {
           throw new Error('You shold have a body parser in your express to parse the body of request.')
         }
-        if (!req.body.token) {
-          throw new Error('You shold have send a token in the body of request to search.')
+        if (!req.headers.Authorization) {
+          throw new Error('You shold have send a Authorization header to search.')
         }
-        const token = req.body.token
-
+        const token = req.headers.Authorization
         const result = await this.getUserData(token)
         req.user = result
+
         if (permissions) {
           const permissionsResult = this.validateSomePermissionCluster(permissions)(req, res)
           if (!permissionsResult) {
