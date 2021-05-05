@@ -29,6 +29,11 @@ app.post('/', QuotiAuth.middleware(), async (req, res) => {
   res.send('OK!')
 })
 ```
+Na prática, esse middleware fará a autenticação com a API do Quoti usando o [Authorization Header](https://developer.mozilla.org/pt-BR/docs/Web/HTTP/Headers/Authorization) que já estaria contido no seu `req.headers`.
+Este header pode ser:
+ - Authorization: Bearer TOKEN
+ - Authorization: BearerStatic TOKEN
+
 
 ## Checando permissões do usuário
 Neste exemplo, o middleware vai checar se o usuário tem a permissão `posts.filter`. Caso ele não tenha, o Quoti Auth vai retornar um erro 401 no endpoint:
