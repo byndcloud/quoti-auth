@@ -45,13 +45,14 @@ class QuotiAuth {
   middleware (permissions = null) {
     return async (req, res, next) => {
       try {
+        console.log(req.headers)
         if (!req.body) {
           throw new Error('You shold have a body parser in your express to parse the body of request.')
         }
-        if (!req.headers.Authorization) {
-          throw new Error('You shold have send a Authorization header to search.')
+        if (!req.headers.authorization) {
+          throw new Error('You shold have send a authorization header to search.')
         }
-        const token = req.headers.Authorization
+        const token = req.headers.authorization
         const result = await this.getUserData(token)
         req.user = result
 
