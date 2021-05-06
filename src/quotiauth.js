@@ -12,12 +12,12 @@ class QuotiAuth {
   }
 
   async getUserData (token) {
-    const url = process.env['api_url'] || 'https://api.minhafaculdade.app/api/v1/'
+    const url = process.env['QUOTI_API_BASE_URL'] || 'http://localhost:8081/api/v1/'
     const headers = {
       ApiKey: this.apiKey
     }
     const { data } = await axios.post(`${url}${this.orgSlug}/auth/login/getuser`, { token }, { headers })
-    return data.user
+    return data
   }
 
   setup ({ orgSlug, apiKey, getUserData, logger }) {
@@ -49,10 +49,10 @@ class QuotiAuth {
         if (!req.body) {
           throw new Error('You shold have a body parser in your express to parse the body of request.')
         }
-        if (!req.headers.authorization) {
-          throw new Error('You shold have send a authorization header to search.')
+        if (!req.body.token) {
+          throw new Error('You shold have send a token in body to search.')
         }
-        const token = req.headers.authorization
+        const token = req.body.token
         const result = await this.getUserData(token)
         req.user = result
 
