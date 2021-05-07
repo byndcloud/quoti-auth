@@ -13,7 +13,7 @@ class QuotiAuth {
 
   async getUserData (token) {
     // console.log('making request')
-    const url = 'http://minhafaculdade.app/api/v1/'
+    const url = 'https://api.minhafaculdade.app/api/v1/'
     const headers = {
       ApiKey: this.apiKey
     }
