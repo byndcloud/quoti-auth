@@ -12,7 +12,8 @@ class QuotiAuth {
   }
 
   async getUserData (token) {
-    const url = process.env['QUOTI_API_BASE_URL'] || 'http://localhost:8081/api/v1/'
+    // console.log('making request')
+    const url = 'http://minhafaculdade.app/api/v1/'
     const headers = {
       ApiKey: this.apiKey
     }
@@ -45,17 +46,17 @@ class QuotiAuth {
   middleware (permissions = null) {
     return async (req, res, next) => {
       try {
-        console.log(req.headers)
         if (!req.body) {
           throw new Error('You shold have a body parser in your express to parse the body of request.')
         }
-        if (!req.body.token) {
-          throw new Error('You shold have send a token in body to search.')
+        if (!req.body.token && !req.headers.bearerstatic && !req.headers.authorization) {
+          // console.log(req.headers)
+          throw new Error('You shold have send a token in the body of request to search.')
         }
-        const token = req.body.token
+        const token = req.body.token || req.headers.bearerstatic ? `BearerStatic ${req.headers.bearerstatic}` : null || req.headers.authorization ? req.headers.authorization : null
+
         const result = await this.getUserData(token)
         req.user = result
-
         if (permissions) {
           const permissionsResult = this.validateSomePermissionCluster(permissions)(req, res)
           if (!permissionsResult) {
@@ -65,8 +66,8 @@ class QuotiAuth {
 
         next()
       } catch (err) {
-        console.error(err)
-        res.status(500).send('Error! See console for more.')
+        console.error(err.response.data || err)
+        res.status(500).send(err.response.data || err)
       }
       return null
     }
