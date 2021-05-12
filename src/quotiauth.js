@@ -13,10 +13,11 @@ class QuotiAuth {
 
   async getUserData (token) {
     // console.log('making request')
-    const url = 'https://api.minhafaculdade.app/api/v1/'
+    const url = 'http://localhost:8081/api/v1/'
     const headers = {
       ApiKey: this.apiKey
     }
+    // console.log('fazendo com o token',token)
     const { data } = await axios.post(`${url}${this.orgSlug}/auth/login/getuser`, { token }, { headers })
     return data
   }
@@ -53,7 +54,8 @@ class QuotiAuth {
           // console.log(req.headers)
           throw new Error('You shold have send a token in the body of request to search.')
         }
-        const token = req.body.token || req.headers.bearerstatic ? `BearerStatic ${req.headers.bearerstatic}` : null || req.headers.authorization ? req.headers.authorization : null
+        // console.log(req.body.token, req.headers)
+        const token = req.body.token || req.headers.authorization ? req.headers.authorization : null || req.headers.bearerstatic ? `BearerStatic ${req.headers.bearerstatic}` : null
 
         const result = await this.getUserData(token)
         req.user = result
@@ -67,7 +69,7 @@ class QuotiAuth {
         next()
       } catch (err) {
         console.error(err.response.data || err)
-        res.status(500).send(err.response.data || err)
+        res.status(err.response.data.includes('Decoding Firebase ID') ? 401 : 500).send(err.response.data || err)
       }
       return null
     }
