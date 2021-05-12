@@ -55,7 +55,13 @@ class QuotiAuth {
           throw new Error('You shold have send a token in the body of request to search.')
         }
         // console.log(req.body.token, req.headers)
-        const token = req.body.token || req.headers.authorization || req.headers.bearerstatic ? `BearerStatic ${req.headers.bearerstatic}` : null
+        let token = req.body.token
+        if (req.headers.bearerstatic) {
+          token = `BearerStatic ${req.headers.bearerstatic}`
+        }
+        if (req.headers.authorization) {
+          token = `${req.headers.authorization}`
+        }
 
         if (!token) {
           throw new Error('Dont received a token.')
