@@ -6,9 +6,7 @@ class QuotiAuth {
     this.setup({ orgSlug, apiKey, getUserData, logger })
   }
 
-  async getUserData ({token, orgSlug}) {
-    // console.log('making request')
-    const url = 'https://api.minhafaculdade.app/api/v1/'
+  async getUserData ({ token, orgSlug }) {
     const headers = {
       ApiKey: this.apiKey
     }
@@ -62,7 +60,7 @@ class QuotiAuth {
           throw new Error('Dont received a token.')
         }
 
-        const result = await this.getUserData({token, orgSlug: req.params.orgSlug || this.orgSlug})
+        const result = await this.getUserData({ token, orgSlug: req.params.orgSlug || this.orgSlug })
         req.user = result
         if (permissions) {
           const permissionsResult = this.validateSomePermissionCluster(permissions)(req, res)

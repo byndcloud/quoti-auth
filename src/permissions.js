@@ -60,18 +60,16 @@ function validateSomePermissionCluster (logger) {
       }
       logger.profile('MiddlewarePermissions', { level: 'verbose' })
 
-      logger.info('Requiring access', { url: req.originalUrl })
+      logger.debug('Requiring access', { url: req.originalUrl })
 
-      logger.info('Validators are', [validators])
+      logger.debug('Validators are', [validators])
 
       // Pass test if no permission required
       if (validators.length === 0) {
-        logger.info('User passed permission test')
+        logger.debug('User passed permission test')
         if (next) { next() }
         return true
       }
-
-      logger.info('Getting users permissions')
 
       // Get user permissions
 
@@ -129,7 +127,7 @@ function validateSomePermissionCluster (logger) {
 
       // If some validator were validated, pass test
       if (req.permissions.validated.length > 0) {
-        logger.info('User passed permission test')
+        logger.debug('User passed permission test')
         if (next) { next() }
         return true
       } else {
