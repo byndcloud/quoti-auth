@@ -7,6 +7,7 @@ class QuotiAuth {
   }
 
   async getUserData ({ token, orgSlug }) {
+    const url = 'https://api.quoti.cloud/api/v1/'
     const headers = {
       ApiKey: this.apiKey
     }

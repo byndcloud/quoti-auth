@@ -50,7 +50,7 @@ const { quotiAuth } = require('quoti-auth')
 
 // Esta função será chamada passando o token do usuário que você está consultando para retornar os dados do usuário.
 async getUserData (token) {
-  const url = process.env['api_url'] || 'https://api.minhafaculdade.app/api/v1/'
+  const url = process.env['api_url'] || 'https://api.quoti.cloud/api/v1/'
   const headers = {
     ApiKey: 'some-api-key'
   }
