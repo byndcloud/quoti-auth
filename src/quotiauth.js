@@ -78,7 +78,7 @@ class QuotiAuth {
         let code = 500
         if (err?.message === 'Missing authentication' || err?.response?.data?.includes("Decoding Firebase ID")) {
           code = 401
-        } else if ('Insufficient permissions or user is null') {
+        } else if (err?.message === 'Insufficient permissions or user is null') {
           code = 403
         }
         res.status(code).send(err?.response?.data || err);
