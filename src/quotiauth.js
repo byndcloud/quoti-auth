@@ -1,6 +1,5 @@
 
 const axios = require('axios')
-const { response } = require('express')
 const Permissions = require('./permissions')
 class QuotiAuth {
   constructor (orgSlug, apiKey, getUserData, logger) {
