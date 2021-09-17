@@ -134,7 +134,6 @@ function validateSomePermissionCluster (logger) {
         const error = new Error(`Insufficient permissions! Permissions ${validators.join(', ')} are required`)
         logger.error(error)
         res.status(403).send(error)
-        next()
       }
     }
   }
