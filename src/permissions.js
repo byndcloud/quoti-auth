@@ -114,7 +114,7 @@ function validateSomePermissionCluster (logger) {
             }
           }
 
-          // If some permission is validated, then the user matchs the validator
+          // If some permission is validated, then the user matches the validator
           if (match.length > 0) {
             req.permissions.validated.push({
               by: 'expression',
@@ -125,7 +125,7 @@ function validateSomePermissionCluster (logger) {
         }
       }
 
-      // If some validator were validated, pass test
+      // If some validator was validated, pass test
       if (req.permissions.validated.length > 0) {
         logger.debug('User passed permission test')
         if (next) { next() }
@@ -133,7 +133,7 @@ function validateSomePermissionCluster (logger) {
       } else {
         const error = new Error(`Insufficient permissions! Permissions ${validators.join(', ')} are required`)
         logger.error(error)
-        res.status(401).send(error)
+        res.status(403).send(error)
       }
     }
   }
