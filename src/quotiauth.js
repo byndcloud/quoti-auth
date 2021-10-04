@@ -72,8 +72,8 @@ class QuotiAuth {
 
         next()
       } catch (err) {
-        console.error(err.response.data || err)
-        res.status(err.response.data.includes('Decoding Firebase ID') ? 401 : 500).send(err.response.data || err)
+        console.error(err.response?.data || err)
+        res.status(err.response?.data.includes('Decoding Firebase ID') ? 401 : 500).send(err.response?.data || err)
       }
       return null
     }
