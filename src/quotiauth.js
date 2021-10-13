@@ -1,4 +1,3 @@
-
 const axios = require('axios')
 const Permissions = require('./permissions')
 class QuotiAuth {
@@ -12,7 +11,11 @@ class QuotiAuth {
       ApiKey: this.apiKey
     }
     // console.log('fazendo com o token',token)
-    const { data } = await axios.post(`${url}${orgSlug || this.orgSlug}/auth/login/getuser`, { token }, { headers })
+    const { data } = await axios.post(
+      `${url}${orgSlug || this.orgSlug}/auth/login/getuser`,
+      { token },
+      { headers }
+    )
     return data
   }
 
@@ -25,7 +28,9 @@ class QuotiAuth {
     }
   }
   getOrganizationalUserOrganizationPermissions (...args) {
-    return Permissions.getOrganizationalUserOrganizationPermissions(this.logger)(...args)
+    return Permissions.getOrganizationalUserOrganizationPermissions(
+      this.logger
+    )(...args)
   }
 
   validateSomePermissionCluster (...args) {
@@ -40,11 +45,11 @@ class QuotiAuth {
    */
   middleware (permissions = null) {
     /**
-     * 
-     * @param {*} req 
-     * @param {import('express').Response} res 
-     * @param {*} next 
-     * @returns 
+     *
+     * @param {*} req
+     * @param {import('express').Response} res
+     * @param {*} next
+     * @returns
      */
     return async (req, res, next) => {
       try {
@@ -60,10 +65,15 @@ class QuotiAuth {
           throw new Error('Missing authentication')
         }
 
-        const result = await this.getUserData({ token, orgSlug: req.params.orgSlug || this.orgSlug })
+        const result = await this.getUserData({
+          token,
+          orgSlug: req.params.orgSlug || this.orgSlug
+        })
         req.user = result
         if (permissions) {
-          const permissionsResult = this.validateSomePermissionCluster(permissions)(req, res)
+          const permissionsResult = this.validateSomePermissionCluster(
+            permissions
+          )(req, res)
           if (!permissionsResult) {
             throw new Error('Insufficient permissions or user is null')
           }
@@ -76,12 +86,17 @@ class QuotiAuth {
         }
 
         let code = 500
-        if (err?.message === 'Missing authentication' || err?.response?.data?.includes("Decoding Firebase ID")) {
+        if (
+          err?.message === 'Missing authentication' ||
+          err?.response?.data?.includes('Decoding Firebase ID')
+        ) {
           code = 401
-        } else if (err?.message === 'Insufficient permissions or user is null') {
+        } else if (
+          err?.message === 'Insufficient permissions or user is null'
+        ) {
           code = 403
         }
-        res.status(code).send(err?.response?.data || err);
+        res.status(code).send(err?.response?.data || err)
       }
       return null
     }
