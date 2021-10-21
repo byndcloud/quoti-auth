@@ -1,4 +1,3 @@
-
 const axios = require('axios')
 const Permissions = require('./permissions')
 class QuotiAuth {
@@ -12,7 +11,11 @@ class QuotiAuth {
       ApiKey: this.apiKey
     }
     // console.log('fazendo com o token',token)
-    const { data } = await axios.post(`${url}${orgSlug || this.orgSlug}/auth/login/getuser`, { token }, { headers })
+    const { data } = await axios.post(
+      `${url}${orgSlug || this.orgSlug}/auth/login/getuser`,
+      { token },
+      { headers }
+    )
     return data
   }
 
@@ -25,7 +28,9 @@ class QuotiAuth {
     }
   }
   getOrganizationalUserOrganizationPermissions (...args) {
-    return Permissions.getOrganizationalUserOrganizationPermissions(this.logger)(...args)
+    return Permissions.getOrganizationalUserOrganizationPermissions(
+      this.logger
+    )(...args)
   }
 
   validateSomePermissionCluster (...args) {
@@ -39,17 +44,16 @@ class QuotiAuth {
    * @param {import('express').NextFunction} next
    */
   middleware (permissions = null) {
+    /**
+     *
+     * @param {*} req
+     * @param {import('express').Response} res
+     * @param {*} next
+     * @returns
+     */
     return async (req, res, next) => {
       try {
-        if (!req.body) {
-          throw new Error('You shold have a body parser in your express to parse the body of request.')
-        }
-        if (!req.body.token && !req.headers.bearerstatic && !req.headers.authorization) {
-          // console.log(req.headers)
-          throw new Error('You shold have send a token in the body of request to search.')
-        }
-        // console.log(req.body.token, req.headers)
-        let token = req.body.token
+        let token = req?.body?.token
         if (req.headers.bearerstatic) {
           token = `BearerStatic ${req.headers.bearerstatic}`
         }
@@ -58,13 +62,18 @@ class QuotiAuth {
         }
 
         if (!token) {
-          throw new Error('Dont received a token.')
+          throw new Error('Missing authentication')
         }
 
-        const result = await this.getUserData({ token, orgSlug: req.params.orgSlug || this.orgSlug })
+        const result = await this.getUserData({
+          token,
+          orgSlug: req.params.orgSlug || this.orgSlug
+        })
         req.user = result
         if (permissions) {
-          const permissionsResult = this.validateSomePermissionCluster(permissions)(req, res)
+          const permissionsResult = this.validateSomePermissionCluster(
+            permissions
+          )(req, res)
           if (!permissionsResult) {
             throw new Error('Insufficient permissions or user is null')
           }
@@ -72,8 +81,22 @@ class QuotiAuth {
 
         next()
       } catch (err) {
-        console.error(err.response?.data || err)
-        res.status(err.response?.data.includes('Decoding Firebase ID') ? 401 : 500).send(err.response?.data || err)
+        if (res.headersSent) {
+          return
+        }
+
+        let code = 500
+        if (
+          err?.message === 'Missing authentication' ||
+          err?.response?.data?.includes('Decoding Firebase ID')
+        ) {
+          code = 401
+        } else if (
+          err?.message === 'Insufficient permissions or user is null'
+        ) {
+          code = 403
+        }
+        res.status(code).send(err?.response?.data || err)
       }
       return null
     }

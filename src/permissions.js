@@ -8,19 +8,25 @@ const getOrganizationalUserOrganizationPermissions = logger => {
   return (slug, permissions) => {
     const organizationPermissions = []
     try {
-    // For each api key environment
+      // For each api key environment
       for (const apiKeyEnvironment in permissions) {
         logger.verbose('Api key environment:', { apiKeyEnvironment })
 
-        logger.verbose('Granted permissions are:', permissions[apiKeyEnvironment])
+        logger.verbose(
+          'Granted permissions are:',
+          permissions[apiKeyEnvironment]
+        )
 
         // If environment is a regular expression
-        if (apiKeyEnvironment.startsWith('/') && apiKeyEnvironment.endsWith('/')) {
+        if (
+          apiKeyEnvironment.startsWith('/') &&
+          apiKeyEnvironment.endsWith('/')
+        ) {
           logger.verbose('Will try to match with', { slug })
 
           // If matchs with organization slug, push permissions (will match /.*/ with any or no organization)
           if (slug.match(new RegExp(apiKeyEnvironment.slice(1, -1), 'g'))) {
-            logger.verbose('It\'s a match! Pushing permissions')
+            logger.verbose("It's a match! Pushing permissions")
 
             organizationPermissions.push(...permissions[apiKeyEnvironment])
           }
@@ -55,19 +61,23 @@ function validateSomePermissionCluster (logger) {
   return (validators = []) => {
     return (req, res, next) => {
       if (!req.user) {
-        if (next) { next() }
+        if (next) {
+          next()
+        }
         return null
       }
-      logger.profile('MiddlewarePermissions', { level: 'verbose' })
+      // logger.profile('MiddlewarePermissions', { level: 'verbose' })
 
-      logger.debug('Requiring access', { url: req.originalUrl })
+      // logger.debug('Requiring access', { url: req.originalUrl })
 
-      logger.debug('Validators are', [validators])
+      // logger.debug('Validators are', [validators])
 
       // Pass test if no permission required
       if (validators.length === 0) {
         logger.debug('User passed permission test')
-        if (next) { next() }
+        if (next) {
+          next()
+        }
         return true
       }
 
@@ -77,7 +87,9 @@ function validateSomePermissionCluster (logger) {
       if (req.get('ApiKey')) {
         const orgSlug = req.params.orgSlug || ''
 
-        const apiKeyPermissions = getOrganizationalUserOrganizationPermissions(logger)(orgSlug, req.user.permissions)
+        const apiKeyPermissions = getOrganizationalUserOrganizationPermissions(
+          logger
+        )(orgSlug, req.user.permissions)
 
         // Push api key permissions to user permissions
         if (req.user.Permissions) {
@@ -95,7 +107,9 @@ function validateSomePermissionCluster (logger) {
       for (const validator of validators) {
         if (validator instanceof Array) {
           // Get the intersection between users permissions and validator permissions
-          const intersection = userPermissions.filter(userPermission => validator.includes(userPermission.name))
+          const intersection = userPermissions.filter(userPermission =>
+            validator.includes(userPermission.name)
+          )
 
           // If the intersection is the validator itself, then the user has all the validator's permissions
           if (intersection.length === validator.length) {
@@ -114,7 +128,7 @@ function validateSomePermissionCluster (logger) {
             }
           }
 
-          // If some permission is validated, then the user matchs the validator
+          // If some permission is validated, then the user matches the validator
           if (match.length > 0) {
             req.permissions.validated.push({
               by: 'expression',
@@ -125,18 +139,27 @@ function validateSomePermissionCluster (logger) {
         }
       }
 
-      // If some validator were validated, pass test
+      // If some validator was validated, pass test
       if (req.permissions.validated.length > 0) {
         logger.debug('User passed permission test')
-        if (next) { next() }
+        if (next) {
+          next()
+        }
         return true
       } else {
-        const error = new Error(`Insufficient permissions! Permissions ${validators.join(', ')} are required`)
+        const error = new Error(
+          `Insufficient permissions! Permissions ${validators.join(
+            ', '
+          )} are required`
+        )
         logger.error(error)
-        res.status(401).send(error)
+        res.status(403).send(error)
       }
     }
   }
 }
 
-module.exports = { validateSomePermissionCluster, getOrganizationalUserOrganizationPermissions }
+module.exports = {
+  validateSomePermissionCluster,
+  getOrganizationalUserOrganizationPermissions
+}
