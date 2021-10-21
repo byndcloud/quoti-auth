@@ -66,11 +66,11 @@ function validateSomePermissionCluster (logger) {
         }
         return null
       }
-      logger.profile('MiddlewarePermissions', { level: 'verbose' })
+      // logger.profile('MiddlewarePermissions', { level: 'verbose' })
 
-      logger.debug('Requiring access', { url: req.originalUrl })
+      // logger.debug('Requiring access', { url: req.originalUrl })
 
-      logger.debug('Validators are', [validators])
+      // logger.debug('Validators are', [validators])
 
       // Pass test if no permission required
       if (validators.length === 0) {
