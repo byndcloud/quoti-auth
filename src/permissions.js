@@ -56,7 +56,7 @@ function getMultiOrgUserOrganizationPermissions (logger) {
  * to continue the request to the next handler.
  */
 function validateSomePermissionClusterMiddleware (logger) {
-  return validators => {
+  return (validators = []) => {
     return (req, res, next) => {
       if (!req.user) {
         if (next) {
