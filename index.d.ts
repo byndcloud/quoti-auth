@@ -1,8 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 
-declare module 'quoti-auth' {
-  export const quotiAuth = new QuotiAuth();
-}
+export const quotiAuth = new QuotiAuth();
 
 // todo: Obtive esse type analisando diretamente o log quando executamos a função getUserData. É isso mesmo?
 type UserData = Partial<{
@@ -68,8 +66,8 @@ type ValidateSomePermissionClusterMiddlewareAux2 = (
   next: NextFunction,
 ) => boolean | null | Response;
 
-class QuotiAuth {
-  constructor(setupConfig: SetupConfig): void;
+declare class QuotiAuth {
+  constructor(setupConfig?: SetupConfig)
 
   middleware(
     permissions: QuotiPermissions,
