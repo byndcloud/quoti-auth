@@ -2,7 +2,6 @@ import { Request, Response, NextFunction } from 'express';
 
 export const quotiAuth = new QuotiAuth();
 
-// todo: Obtive esse type analisando diretamente o log quando executamos a função getUserData. É isso mesmo?
 type UserData = Partial<{
   id: number;
   uuid: string;
