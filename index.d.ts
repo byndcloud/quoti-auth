@@ -2,12 +2,10 @@ import { Request, Response, NextFunction } from 'express';
 
 export const quotiAuth = new QuotiAuth();
 
-type UserData = Partial<{
-  id: number;
+type UserData = {user: string, userCreated: 'true' | 'false', id:number } & Partial<{
   uuid: string;
   name: string;
   gender: string;
-  user: string;
   pass: string;
   passwordStrength: string;
   cpf: string | number;
@@ -21,7 +19,7 @@ type UserData = Partial<{
   tokenPasswordResetTimes: string;
   registered: boolean;
   lastLoginTime: string;
-  userCreated: string | boolean;
+  
   createdTime: string;
   updatedTime: string;
   userProfileId: number;
@@ -40,8 +38,8 @@ type UserData = Partial<{
   media_id: number;
   image: string;
   UsersProfile: { id: number; homePageDefault: string };
-  Groups: { id: number; name: string }[];
-  Permissions: { id: number; name: string }[];
+  Groups: { id: number; name: string; type: string; cod: string }[];
+  Permissions: { id: number; name: string; }[];
 }>;
 
 type QuotiPermissions = string[][];
@@ -78,10 +76,10 @@ declare class QuotiAuth {
 
   setup(setupConfig: SetupConfig): void;
 
-  getUserData(data: {
+  getUserData<T = UserData>(data: {
     token: string;
     orgSlug: string;
-  }): Promise<UserData | unknown>;
+  }): Promise<T>;
 
   validateSomePermissionCluster(
     permissions: QuotiPermissions,
