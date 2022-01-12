@@ -28,6 +28,10 @@ class QuotiAuth {
     }
   }
 
+  getMultiOrgUserOrganizationPermissions (...args) {
+    return Permissions.getMultiOrgUserOrganizationPermissions(this.logger)(...args)
+  }
+
   validateSomePermissionCluster (...args) {
     return Permissions.validateSomePermissionClusterMiddleware(this.logger)(...args)
   }

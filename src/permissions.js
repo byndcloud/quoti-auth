@@ -1,4 +1,5 @@
 const { uniqBy } = require('lodash')
+const { typeCheck } = require('type-check')
 
 /**
  * Get the permissions that a multi organization user has within an organization
@@ -56,7 +57,20 @@ function getMultiOrgUserOrganizationPermissions (logger) {
  * to continue the request to the next handler.
  */
 function validateSomePermissionClusterMiddleware (logger) {
-  return (validators = []) => {
+  /**
+   * @param {(RegExp | string)[][]|() => (RegExp | string)[][]} validatorsOrFunction
+   */
+  return (validatorsOrFunction = []) => {
+    const validatorsOrFunctionType = typeof validatorsOrFunction
+    if (
+      validatorsOrFunctionType !== 'function' &&
+      typeCheck('[[String | RegExp]]', validatorsOrFunction) === false
+    ) {
+      const error = new Error(
+        `Invalid permissions argument type (${validatorsOrFunctionType}) should be (string | RegExp)[][], a function that returns (string | RegExp)[][] or undefined`
+      )
+      throw error
+    }
     return (req, res, next) => {
       if (!req.user) {
         if (next) {
@@ -64,13 +78,21 @@ function validateSomePermissionClusterMiddleware (logger) {
         }
         return null
       }
-      // logger.profile('MiddlewarePermissions', { level: 'verbose' })
 
-      // logger.debug('Requiring access', { url: req.originalUrl })
+      const validators =
+        validatorsOrFunctionType === 'function'
+          ? validatorsOrFunction(req)
+          : validatorsOrFunction
 
-      // logger.debug('Validators are', [validators])
+      if (typeCheck('[[String | RegExp]]', validators) === false) {
+        const error = new Error(
+          `Invalid permissions argument type (${typeof validators}): should be either (RegExp | string)[][], a function that returns (RegExp | string)[][] or undefined.`
+        )
+        next(error)
+        return false
+      }
 
-      // Pass test if no permission required
+      // Pass test if no permission is required
       if (validators.length === 0) {
         logger.debug('User passed permission test')
         if (next) {
@@ -78,8 +100,12 @@ function validateSomePermissionClusterMiddleware (logger) {
         }
         return true
       }
-
-      const validatedPermissions = validateSomePermissionCluster(logger)(validators, req.user, req.params.orgSlug, !!req.get('ApiKey'))
+      const validatedPermissions = validateSomePermissionCluster(logger)(
+        validators,
+        req.user,
+        req.params.orgSlug || '',
+        !!req.get('ApiKey')
+      )
 
       // If some validator was validated, pass test
       if (validatedPermissions.length > 0) {
@@ -130,12 +156,13 @@ function validateSomePermissionClusterMiddleware (logger) {
  * @returns {PermissionClusterValidation[]}
  */
 function validateSomePermissionCluster (logger) {
-  return (validators = [], user, orgSlug, usingApiKey) => {
+  return (validators = [], user, orgSlug = '', usingApiKey = false) => {
     // If auth method is api key
     if (usingApiKey) {
-      const apiKeyPermissions = getMultiOrgUserOrganizationPermissions(
-        logger
-      )(orgSlug, user.permissions)
+      const apiKeyPermissions = getMultiOrgUserOrganizationPermissions(logger)(
+        orgSlug,
+        user.permissions
+      )
 
       // Push api key permissions to user permissions
       if (user.Permissions) {
