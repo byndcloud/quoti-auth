@@ -63,7 +63,7 @@ function validateSomePermissionClusterMiddleware (logger) {
   return (validatorsOrFunction = []) => {
     const validatorsOrFunctionType = typeof validatorsOrFunction
     if (
-      typeof validatorsOrFunction !== 'function' &&
+      validatorsOrFunctionType !== 'function' &&
       typeCheck('[[String | RegExp]]', validatorsOrFunction) === false
     ) {
       const error = new Error(
@@ -78,14 +78,9 @@ function validateSomePermissionClusterMiddleware (logger) {
         }
         return null
       }
-      // logger.profile('MiddlewarePermissions', { level: 'verbose' })
-
-      // logger.debug('Requiring access', { url: req.originalUrl })
-
-      // logger.debug('Validators are', [validators])
 
       const validators =
-        typeof validatorsOrFunction === 'function'
+        validatorsOrFunctionType === 'function'
           ? validatorsOrFunction(req)
           : validatorsOrFunction
 
@@ -97,7 +92,7 @@ function validateSomePermissionClusterMiddleware (logger) {
         return false
       }
 
-      // Pass test if no permission required
+      // Pass test if no permission is required
       if (validators.length === 0) {
         logger.debug('User passed permission test')
         if (next) {
@@ -105,7 +100,6 @@ function validateSomePermissionClusterMiddleware (logger) {
         }
         return true
       }
-      // try {
       const validatedPermissions = validateSomePermissionCluster(logger)(
         validators,
         req.user,
@@ -124,16 +118,13 @@ function validateSomePermissionClusterMiddleware (logger) {
         return true
       } else {
         const error = new Error(
-            `Insufficient permissions! Permissions ${validators.join(
-              ', '
-            )} are required`
+          `Insufficient permissions! Permissions ${validators.join(
+            ', '
+          )} are required`
         )
         logger.error(error)
         return res.status(403).send(error)
       }
-      // } catch (err) {
-      //   console.error(err)
-      // }
     }
   }
 }
