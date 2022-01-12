@@ -111,10 +111,10 @@ class QuotiAuth {
         ) {
           code = 403
         } else if (errorMessage?.includes?.('Invalid recaptcha token')) {
-          code = 429
+          code = 401
           this.logger.error('Axios error', new AxiosError(err))
         }
-        res.status(code).send(err?.response?.data)
+        res.status(code).send(err?.response?.data || errorMessage)
       }
       return null
     }
