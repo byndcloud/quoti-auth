@@ -85,13 +85,18 @@ class QuotiAuth {
         }
 
         let code = 500
+        const errorMessage =
+          err?.message ||
+          err?.response?.data?.message ||
+          err?.response?.data ||
+          ''
         if (
-          err?.message === 'Missing authentication' ||
-          err?.response?.data?.includes('Decoding Firebase ID')
+          errorMessage?.includes?.('Missing authentication') ||
+          errorMessage?.includes?.('Decoding Firebase ID')
         ) {
           code = 401
         } else if (
-          err?.message === 'Insufficient permissions or user is null'
+          errorMessage?.includes?.('Insufficient permissions or user is null')
         ) {
           code = 403
         }
