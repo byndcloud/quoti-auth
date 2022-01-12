@@ -1,5 +1,10 @@
 const axios = require('axios')
 const Permissions = require('./permissions')
+const axiosBetterStackTrace = require('axios-better-stacktrace').default
+const AxiosError = require('axios-error')
+
+axiosBetterStackTrace(axios)
+
 class QuotiAuth {
   constructor (orgSlug, apiKey, getUserData, logger) {
     this.setup({ orgSlug, apiKey, getUserData, logger })
@@ -84,27 +89,32 @@ class QuotiAuth {
 
         next()
       } catch (err) {
+        this.logger.error(err.stack)
         if (res.headersSent) {
           return
         }
 
         let code = 500
         const errorMessage =
-          err?.message ||
           err?.response?.data?.message ||
           err?.response?.data ||
+          err?.message ||
           ''
         if (
           errorMessage?.includes?.('Missing authentication') ||
-          errorMessage?.includes?.('Decoding Firebase ID')
+          errorMessage?.includes?.('Decoding Firebase ID') ||
+          errorMessage?.includes?.('Firebase ID token has expired')
         ) {
           code = 401
         } else if (
           errorMessage?.includes?.('Insufficient permissions or user is null')
         ) {
           code = 403
+        } else if (errorMessage?.includes?.('Invalid recaptcha token')) {
+          code = 429
+          this.logger.error('Axios error', new AxiosError(err))
         }
-        res.status(code).send(err?.response?.data || err)
+        res.status(code).send(err?.response?.data)
       }
       return null
     }
