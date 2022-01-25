@@ -10,14 +10,14 @@ class QuotiAuth {
     this.setup({ orgSlug, apiKey, getUserData, logger })
   }
 
-  async getUserData ({ token, orgSlug = this.orgSlug }) {
+  async getUserData ({ token, orgSlug }) {
     const url = 'https://api.quoti.cloud/api/v1/'
     const headers = {
       ApiKey: this.apiKey
     }
 
     const { data } = await axios.post(
-      `${url}${orgSlug}/auth/login/getuser`,
+      `${url}${orgSlug || this.orgSlug}/auth/login/getuser`,
       { token },
       { headers }
     )
