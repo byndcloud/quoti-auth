@@ -67,7 +67,7 @@ type ValidateSomePermissionClusterMiddlewareAux2 = (
 
 export class QuotiAuth {
   constructor(
-    orgSlug?: string,
+    public readonly orgSlug?: string,
     apiKey?: string,
     getUserData?: unknown,
     logger?: Console | any
