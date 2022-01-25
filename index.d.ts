@@ -81,7 +81,7 @@ export class QuotiAuth {
 
   getUserData<T = UserData>(data: {
     token: string
-    orgSlug: string
+    orgSlug?: string
   }): Promise<T>
 
   validateSomePermissionCluster(
