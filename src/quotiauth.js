@@ -15,7 +15,7 @@ class QuotiAuth {
     const headers = {
       ApiKey: this.apiKey
     }
-    // console.log('fazendo com o token',token)
+
     const { data } = await axios.post(
       `${url}${orgSlug || this.orgSlug}/auth/login/getuser`,
       { token },
@@ -122,3 +122,4 @@ class QuotiAuth {
 }
 
 exports.quotiAuth = new QuotiAuth()
+exports.QuotiAuth = QuotiAuth
