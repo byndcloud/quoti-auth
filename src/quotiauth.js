@@ -1,5 +1,10 @@
 const axios = require('axios')
 const Permissions = require('./permissions')
+const axiosBetterStackTrace = require('axios-better-stacktrace').default
+const AxiosError = require('axios-error')
+
+axiosBetterStackTrace(axios)
+
 class QuotiAuth {
   constructor (orgSlug, apiKey, getUserData, logger) {
     this.setup({ orgSlug, apiKey, getUserData, logger })
@@ -10,7 +15,7 @@ class QuotiAuth {
     const headers = {
       ApiKey: this.apiKey
     }
-    // console.log('fazendo com o token',token)
+
     const { data } = await axios.post(
       `${url}${orgSlug || this.orgSlug}/auth/login/getuser`,
       { token },
@@ -28,8 +33,16 @@ class QuotiAuth {
     }
   }
 
+  getMultiOrgUserOrganizationPermissions (...args) {
+    return Permissions.getMultiOrgUserOrganizationPermissions(this.logger)(
+      ...args
+    )
+  }
+
   validateSomePermissionCluster (...args) {
-    return Permissions.validateSomePermissionClusterMiddleware(this.logger)(...args)
+    return Permissions.validateSomePermissionClusterMiddleware(this.logger)(
+      ...args
+    )
   }
 
   /**
@@ -76,22 +89,32 @@ class QuotiAuth {
 
         next()
       } catch (err) {
+        this.logger.error(err.stack)
         if (res.headersSent) {
           return
         }
 
         let code = 500
+        const errorMessage =
+          err?.response?.data?.message ||
+          err?.response?.data ||
+          err?.message ||
+          ''
         if (
-          err?.message === 'Missing authentication' ||
-          err?.response?.data?.includes('Decoding Firebase ID')
+          errorMessage?.includes?.('Missing authentication') ||
+          errorMessage?.includes?.('Decoding Firebase ID') ||
+          errorMessage?.includes?.('Firebase ID token has expired')
         ) {
           code = 401
         } else if (
-          err?.message === 'Insufficient permissions or user is null'
+          errorMessage?.includes?.('Insufficient permissions or user is null')
         ) {
           code = 403
+        } else if (errorMessage?.includes?.('Invalid recaptcha token')) {
+          code = 401
+          this.logger.error('Axios error', new AxiosError(err))
         }
-        res.status(code).send(err?.response?.data || err)
+        res.status(code).send(err?.response?.data || errorMessage)
       }
       return null
     }
@@ -99,3 +122,4 @@ class QuotiAuth {
 }
 
 exports.quotiAuth = new QuotiAuth()
+exports.QuotiAuth = QuotiAuth
