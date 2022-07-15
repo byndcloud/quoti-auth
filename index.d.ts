@@ -1,6 +1,4 @@
-import { Request, Response, NextFunction } from 'express'
-
-type UserData = {
+export type UserData = {
   user: string
   userCreated: 'true' | 'false'
   id: number
@@ -43,50 +41,3 @@ type UserData = {
   Groups: { id: number; name: string; type: string; cod: string }[]
   Permissions: { id: number; name: string }[]
 }>
-
-type QuotiPermissions = string[][]
-// todo: verificar o type logger. Provavelmente o logger do quoti não tem type console
-type SetupConfig = {
-  orgSlug?: string
-  apiKey?: string
-  getUserData?: unknown
-  logger?: Console | any
-}
-
-type ValidateSomePermissionClusterMiddleware = (
-  logger
-) => ValidateSomePermissionClusterMiddlewareAux
-type ValidateSomePermissionClusterMiddlewareAux = (
-  validators: string[]
-) => ValidateSomePermissionClusterMiddlewareAux2
-type ValidateSomePermissionClusterMiddlewareAux2 = (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => boolean | null | Response
-
-export class QuotiAuth {
-  constructor(
-    public readonly orgSlug?: string,
-    apiKey?: string,
-    getUserData?: unknown,
-    logger?: Console | any
-  )
-
-  middleware(
-    permissions: QuotiPermissions
-  ): (req: Request, res: Response, next: NextFunction) => null | void | Response
-
-  setup(setupConfig: SetupConfig): void
-
-  getUserData<T = UserData>(data: {
-    token: string
-    orgSlug?: string
-  }): Promise<T>
-
-  validateSomePermissionCluster(
-    permissions: QuotiPermissions
-  ): ValidateSomePermissionClusterMiddlewareAux2
-}
-
-export const quotiAuth: QuotiAuth
