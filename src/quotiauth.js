@@ -122,4 +122,5 @@ class QuotiAuth {
 }
 
 exports.quotiAuth = new QuotiAuth()
+exports.permissions = Permissions
 exports.QuotiAuth = QuotiAuth
