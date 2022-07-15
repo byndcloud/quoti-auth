@@ -5,11 +5,32 @@ const AxiosError = require('axios-error')
 
 axiosBetterStackTrace(axios)
 
+/**
+   * @callback Middleware
+   * @param {import('express').Request} req
+   * @param {import('express').Response} res
+   * @param {import('express').NextFunction} next
+   */
+
 class QuotiAuth {
+  /**
+   * @description Setups the orgSlug and apiKey
+   * @param {Object} - { orgSlug, apiKey, getUserData, logger }
+   * @param {String} orgSlug - Organization slug
+   * @param {String} apiKey - Quoti API key
+   * @param {Function} [getUserData] - function that returns user data
+   * @param {Function} [logger] - Winston logger
+   */
   constructor (orgSlug, apiKey, getUserData, logger) {
     this.setup({ orgSlug, apiKey, getUserData, logger })
   }
 
+  /**
+   * @param {Object} param0
+   * @param {string} token
+   * @param {string} orgSlug
+   * @returns {import('../index').UserData}
+   */
   async getUserData ({ token, orgSlug }) {
     const url = 'https://api.quoti.cloud/api/v1/'
     const headers = {
@@ -24,6 +45,14 @@ class QuotiAuth {
     return data
   }
 
+  /**
+   * @description Setups the orgSlug and apiKey
+   * @param {Object} - { orgSlug, apiKey, getUserData, logger }
+   * @param {String} orgSlug - Organization slug
+   * @param {String} apiKey - Quoti API key
+   * @param {Function} [getUserData] - function that returns user data
+   * @param {Function} [logger] - Winston logger
+   */
   setup ({ orgSlug, apiKey, getUserData, logger }) {
     this.orgSlug = orgSlug
     this.apiKey = apiKey
@@ -46,19 +75,11 @@ class QuotiAuth {
   }
 
   /**
-   * @description Sets req.user
-   * @param {import('express').Request} req
-   * @param {import('express').Response} res
-   * @param {import('express').NextFunction} next
+   *
+   * @param {import('./permissions').Validators} permissions
+   * @returns {Middleware}
    */
   middleware (permissions = null) {
-    /**
-     *
-     * @param {*} req
-     * @param {import('express').Response} res
-     * @param {*} next
-     * @returns
-     */
     return async (req, res, next) => {
       try {
         let token = req?.body?.token
