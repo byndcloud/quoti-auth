@@ -20,12 +20,12 @@ export class QuotiAuth {
      * @param {Object} param0
      * @param {string} param0.token
      * @param {string} param0.orgSlug
-     * @returns {Promise<import('../index').UserData | string>}
+     * @returns {Promise<import('../types/user').UserData | string>}
      */
     getUserData({ token, orgSlug }: {
         token: string;
         orgSlug: string;
-    }): Promise<import('../index').UserData | string>;
+    }): Promise<import('../types/user').UserData | string>;
     /**
      * @description Setups the orgSlug and apiKey
      * @param {Object} - { orgSlug, apiKey, getUserData, logger }

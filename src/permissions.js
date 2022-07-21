@@ -158,7 +158,7 @@ function validateSomePermissionClusterMiddleware (logger) {
 /**
  * @callback PermissionClusterValidatorFunction
  * @param {Validators} validators The validators to use against the user's permissions
- * @param {} user The user to validate
+ * @param {import('../types/user').UserData} user The user to validate
  * @param {string} orgSlug The organization slug of the user
  * @param {boolean} isApiKey Whether the user is using an api key to authenticate itself
  * @returns {PermissionClusterValidationResult[]}

@@ -29,7 +29,7 @@ class QuotiAuth {
    * @param {Object} param0
    * @param {string} param0.token
    * @param {string} param0.orgSlug
-   * @returns {Promise<import('../index').UserData | string>}
+   * @returns {Promise<import('../types/user').UserData | string>}
    */
   async getUserData ({ token, orgSlug }) {
     const url = 'https://api.quoti.cloud/api/v1/'
