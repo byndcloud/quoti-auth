@@ -1,11 +1,11 @@
 export const quotiAuth: QuotiAuth;
 export type Middleware = (req: import('express').Request, res: import('express').Response, next: import('express').NextFunction) => any;
 /**
-   * @callback Middleware
-   * @param {import('express').Request} req
-   * @param {import('express').Response} res
-   * @param {import('express').NextFunction} next
-   */
+ * @callback Middleware
+ * @param {import('express').Request} req
+ * @param {import('express').Response} res
+ * @param {import('express').NextFunction} next
+ */
 export class QuotiAuth {
     /**
      * @description Setups the orgSlug and apiKey
@@ -16,10 +16,16 @@ export class QuotiAuth {
      * @param {Function} [logger] - Winston logger
      */
     constructor(orgSlug: string, apiKey: string, getUserData?: Function, logger?: Function);
+    /**
+     * @param {Object} param0
+     * @param {string} param0.token
+     * @param {string} param0.orgSlug
+     * @returns {Promise<import('../index').UserData | string>}
+     */
     getUserData({ token, orgSlug }: {
-        token: any;
-        orgSlug: any;
-    }): Promise<any>;
+        token: string;
+        orgSlug: string;
+    }): Promise<import('../index').UserData | string>;
     /**
      * @description Setups the orgSlug and apiKey
      * @param {Object} - { orgSlug, apiKey, getUserData, logger }

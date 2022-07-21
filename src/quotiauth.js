@@ -6,11 +6,11 @@ const AxiosError = require('axios-error')
 axiosBetterStackTrace(axios)
 
 /**
-   * @callback Middleware
-   * @param {import('express').Request} req
-   * @param {import('express').Response} res
-   * @param {import('express').NextFunction} next
-   */
+ * @callback Middleware
+ * @param {import('express').Request} req
+ * @param {import('express').Response} res
+ * @param {import('express').NextFunction} next
+ */
 
 class QuotiAuth {
   /**
@@ -27,9 +27,9 @@ class QuotiAuth {
 
   /**
    * @param {Object} param0
-   * @param {string} token
-   * @param {string} orgSlug
-   * @returns {import('../index').UserData}
+   * @param {string} param0.token
+   * @param {string} param0.orgSlug
+   * @returns {Promise<import('../index').UserData | string>}
    */
   async getUserData ({ token, orgSlug }) {
     const url = 'https://api.quoti.cloud/api/v1/'

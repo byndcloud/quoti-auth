@@ -161,7 +161,7 @@ function validateSomePermissionClusterMiddleware (logger) {
  * @param {} user The user to validate
  * @param {string} orgSlug The organization slug of the user
  * @param {boolean} isApiKey Whether the user is using an api key to authenticate itself
- * @returns {PermissionClusterValidationResult}
+ * @returns {PermissionClusterValidationResult[]}
  */
 
 /**

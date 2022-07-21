@@ -29,7 +29,7 @@ export type PermissionClusterValidationResult = {
      */
     intersection: Permissions[];
 };
-export type PermissionClusterValidatorFunction = (validators: Validators, user: any, orgSlug: string, isApiKey: boolean) => PermissionClusterValidationResult;
+export type PermissionClusterValidatorFunction = (validators: Validators, user: any, orgSlug: string, isApiKey: boolean) => PermissionClusterValidationResult[];
 /**
  * @typedef {(RegExp | string)[][]} Validators
  */
@@ -66,7 +66,7 @@ export function validateSomePermissionClusterMiddleware(logger: any): import('./
  * @param {} user The user to validate
  * @param {string} orgSlug The organization slug of the user
  * @param {boolean} isApiKey Whether the user is using an api key to authenticate itself
- * @returns {PermissionClusterValidationResult}
+ * @returns {PermissionClusterValidationResult[]}
  */
 /**
  * This is a factory that receives a logger and returns a funcion that validates
