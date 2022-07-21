@@ -151,8 +151,8 @@ function validateSomePermissionClusterMiddleware (logger) {
  * @typedef PermissionClusterValidationResult
  * @property {"intersection"|"expression"} by The form of validation used
  * @property {RegExp} [expression] The regex used to validate the permissions (only present when `by = 'expression'`)
- * @property {Permissions[]} match The permissions matched by the regex (only present when `by = 'expression'`)
- * @property {Permissions[]} intersection The permissions that the user has and that were requested (only present when `by = 'intersection'`)
+ * @property {Permission[]} match The permissions matched by the regex (only present when `by = 'expression'`)
+ * @property {Permission[]} intersection The permissions that the user has and that were requested (only present when `by = 'intersection'`)
  */
 
 /**

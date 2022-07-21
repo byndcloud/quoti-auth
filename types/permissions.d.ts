@@ -23,11 +23,11 @@ export type PermissionClusterValidationResult = {
     /**
      * The permissions matched by the regex (only present when `by = 'expression'`)
      */
-    match: Permissions[];
+    match: Permission[];
     /**
      * The permissions that the user has and that were requested (only present when `by = 'intersection'`)
      */
-    intersection: Permissions[];
+    intersection: Permission[];
 };
 export type PermissionClusterValidatorFunction = (validators: Validators, user: any, orgSlug: string, isApiKey: boolean) => PermissionClusterValidationResult[];
 /**
@@ -57,8 +57,8 @@ export function validateSomePermissionClusterMiddleware(logger: any): import('./
  * @typedef PermissionClusterValidationResult
  * @property {"intersection"|"expression"} by The form of validation used
  * @property {RegExp} [expression] The regex used to validate the permissions (only present when `by = 'expression'`)
- * @property {Permissions[]} match The permissions matched by the regex (only present when `by = 'expression'`)
- * @property {Permissions[]} intersection The permissions that the user has and that were requested (only present when `by = 'intersection'`)
+ * @property {Permission[]} match The permissions matched by the regex (only present when `by = 'expression'`)
+ * @property {Permission[]} intersection The permissions that the user has and that were requested (only present when `by = 'intersection'`)
  */
 /**
  * @callback PermissionClusterValidatorFunction
