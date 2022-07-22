@@ -19,7 +19,6 @@ export type UserData = {
   tokenPasswordResetTimes: string
   registered: boolean
   lastLoginTime: string
-
   createdTime: string
   updatedTime: string
   userProfileId: number
