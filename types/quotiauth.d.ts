@@ -9,13 +9,12 @@ export type Middleware = (req: import('express').Request, res: import('express')
 export class QuotiAuth {
     /**
      * @description Setups the orgSlug and apiKey
-     * @param {Object} - { orgSlug, apiKey, getUserData, logger }
      * @param {String} orgSlug - Organization slug
      * @param {String} apiKey - Quoti API key
      * @param {Function} [getUserData] - function that returns user data
-     * @param {Function} [logger] - Winston logger
+     * @param {Object} [logger] - Winston logger
      */
-    constructor(orgSlug: string, apiKey: string, getUserData?: Function, logger?: Function);
+    constructor(orgSlug: string, apiKey: string, getUserData?: Function, logger?: any);
     /**
      * @param {Object} param0
      * @param {string} param0.token
@@ -28,15 +27,20 @@ export class QuotiAuth {
     }): Promise<import('../types/user').UserData | string>;
     /**
      * @description Setups the orgSlug and apiKey
-     * @param {Object} - { orgSlug, apiKey, getUserData, logger }
-     * @param {String} orgSlug - Organization slug
-     * @param {String} apiKey - Quoti API key
-     * @param {Function} [getUserData] - function that returns user data
-     * @param {Function} [logger] - Winston logger
+     * @param {Object} params - { orgSlug, apiKey, getUserData, logger }
+     * @param {String} params.orgSlug - Organization slug
+     * @param {String} params.apiKey - Quoti API key
+     * @param {Function} [params.getUserData] - function that returns user data
+     * @param {Object} [params.logger] - Winston logger
      */
-    setup({ orgSlug, apiKey, getUserData, logger }: any): void;
-    orgSlug: any;
-    apiKey: any;
+    setup({ orgSlug, apiKey, getUserData, logger }: {
+        orgSlug: string;
+        apiKey: string;
+        getUserData?: Function;
+        logger?: any;
+    }): void;
+    orgSlug: string;
+    apiKey: string;
     logger: any;
     getMultiOrgUserOrganizationPermissions(...args: any[]): any[];
     validateSomePermissionCluster(...args: any[]): any;

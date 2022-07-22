@@ -15,11 +15,10 @@ axiosBetterStackTrace(axios)
 class QuotiAuth {
   /**
    * @description Setups the orgSlug and apiKey
-   * @param {Object} - { orgSlug, apiKey, getUserData, logger }
    * @param {String} orgSlug - Organization slug
    * @param {String} apiKey - Quoti API key
    * @param {Function} [getUserData] - function that returns user data
-   * @param {Function} [logger] - Winston logger
+   * @param {Object} [logger] - Winston logger
    */
   constructor (orgSlug, apiKey, getUserData, logger) {
     this.setup({ orgSlug, apiKey, getUserData, logger })
@@ -47,11 +46,11 @@ class QuotiAuth {
 
   /**
    * @description Setups the orgSlug and apiKey
-   * @param {Object} - { orgSlug, apiKey, getUserData, logger }
-   * @param {String} orgSlug - Organization slug
-   * @param {String} apiKey - Quoti API key
-   * @param {Function} [getUserData] - function that returns user data
-   * @param {Function} [logger] - Winston logger
+   * @param {Object} params - { orgSlug, apiKey, getUserData, logger }
+   * @param {String} params.orgSlug - Organization slug
+   * @param {String} params.apiKey - Quoti API key
+   * @param {Function} [params.getUserData] - function that returns user data
+   * @param {Object} [params.logger] - Winston logger
    */
   setup ({ orgSlug, apiKey, getUserData, logger }) {
     this.orgSlug = orgSlug
