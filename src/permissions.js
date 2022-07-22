@@ -51,14 +51,26 @@ function getMultiOrgUserOrganizationPermissions (logger) {
 }
 
 /**
+ * @typedef {(RegExp | string)[][]} Validators
+ */
+/**
+ * @callback ValidatorsGenerator
+ * @param {import('express').Request} req
+ * @returns {Validators}
+ */
+/**
+ * @typedef {Validators | ValidatorsGenerator} ValidatorsOrValidatorsGenerator
+ */
+
+/**
  * Permission middleware factory
  * @param {*} logger
- * @returns A middleware that checks if the user in req.user has the permissions
+ * @returns {import('./quotiauth').Middleware} A middleware that checks if the user in req.user has the permissions
  * to continue the request to the next handler.
  */
 function validateSomePermissionClusterMiddleware (logger) {
   /**
-   * @param {(RegExp | string)[][]|() => (RegExp | string)[][]} validatorsOrFunction
+   * @param {ValidatorsOrValidatorsGenerator} validatorsOrFunction
    */
   return (validatorsOrFunction = []) => {
     const validatorsOrFunctionType = typeof validatorsOrFunction
@@ -136,24 +148,31 @@ function validateSomePermissionClusterMiddleware (logger) {
  */
 
 /**
- * @typedef PermissionClusterValidation
+ * @typedef PermissionClusterValidationResult
  * @property {"intersection"|"expression"} by The form of validation used
  * @property {RegExp} [expression] The regex used to validate the permissions (only present when `by = 'expression'`)
- * @property {Permissions[]} match The permissions matched by the regex (only present when `by = 'expression'`)
- * @property {Permissions[]} intersection The permissions that the user has and that were requested (only present when `by = 'intersection'`)
+ * @property {Permission[]} match The permissions matched by the regex (only present when `by = 'expression'`)
+ * @property {Permission[]} intersection The permissions that the user has and that were requested (only present when `by = 'intersection'`)
  */
 
 /**
- * This function receives an array of validators, and tries to validate some of
- * them, i.e., each validator can be an array or a regular expression. When it's
- * an array, the validator requires the user to have all of its permissions.
- * When it's a regular expression, the validator requires some user permission
- * to match it.
- * @param {string[][]|RegExp>} validators Validators
- * @param {any} user User to check permissions from.
- * @param {string} orgSlug The slug of the requested organization
- * @param {boolean} usingApiKey If the user is using an API key
- * @returns {PermissionClusterValidation[]}
+ * @callback PermissionClusterValidatorFunction
+ * @param {Validators} validators The validators to use against the user's permissions
+ * @param {import('../types/user').UserData} user The user to validate
+ * @param {string} orgSlug The organization slug of the user
+ * @param {boolean} isApiKey Whether the user is using an api key to authenticate itself
+ * @returns {PermissionClusterValidationResult[]}
+ */
+
+/**
+ * This is a factory that receives a logger and returns a funcion that validates
+ * user's permissions. The returned function receives an array of validators,
+ * and tries to validate some of them, i.e., each validator can be an array or a
+ * regular expression. When it's an array, the validator requires the user to
+ * have all of its permissions. When it's a regular expression, the validator
+ * requires some user permission to match it.
+ * @param {*} logger
+ * @returns {PermissionClusterValidatorFunction}
  */
 function validateSomePermissionCluster (logger) {
   return (validators = [], user, orgSlug = '', usingApiKey = false) => {
