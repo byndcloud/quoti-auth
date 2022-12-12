@@ -44,11 +44,16 @@ class QuotiAuth {
       ApiKey: this.apiKey
     }
 
+    if (Array.isArray(includePermissions)) {
+      includePermissions = includePermissions.flat(Infinity)
+    }
+
     const { data } = await axios.post(
       `${url}${orgSlug || this.orgSlug}/auth/login/getuser`,
-      { token },
+      { token, includePermissions },
       { headers }
     )
+
     return data
   }
 
@@ -115,7 +120,8 @@ class QuotiAuth {
 
         const result = await this.getUserData({
           token,
-          orgSlug: req.params.orgSlug || this.orgSlug
+          orgSlug: req.params.orgSlug || this.orgSlug,
+          includePermissions: permissions
         })
         req.user = result
         if (permissions) {
