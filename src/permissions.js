@@ -10,9 +10,9 @@ function getMultiOrgUserOrganizationPermissions (slug, permissions) {
   try {
     // For each api key environment
     for (const apiKeyEnvironment in permissions) {
-      this.logger.verbose('Api key environment:', { apiKeyEnvironment })
+      this.logger.debug('Api key environment:', { apiKeyEnvironment })
 
-      this.logger.verbose(
+      this.logger.debug(
         'Granted permissions are:',
         permissions[apiKeyEnvironment]
       )
@@ -22,20 +22,20 @@ function getMultiOrgUserOrganizationPermissions (slug, permissions) {
         apiKeyEnvironment.startsWith('/') &&
           apiKeyEnvironment.endsWith('/')
       ) {
-        this.logger.verbose('Will try to match with', { slug })
+        this.logger.debug('Will try to match with', { slug })
 
         // If matchs with organization slug, push permissions (will match /.*/ with any or no organization)
         if (slug.match(new RegExp(apiKeyEnvironment.slice(1, -1), 'g'))) {
-          this.logger.verbose("It's a match! Pushing permissions")
+          this.logger.debug("It's a match! Pushing permissions")
 
           organizationPermissions.push(...permissions[apiKeyEnvironment])
         }
       } else {
-        this.logger.verbose('Will try to compare with', { slug })
+        this.logger.debug('Will try to compare with', { slug })
 
         // If it's a simple string, and is equal to the organization slug, push permissions
         if (apiKeyEnvironment === slug) {
-          this.logger.verbose('Sucess! Pushing permissions', { slug })
+          this.logger.debug('Sucess! Pushing permissions', { slug })
 
           organizationPermissions.push(...permissions[apiKeyEnvironment])
         }
