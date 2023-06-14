@@ -5,49 +5,47 @@ const { typeCheck } = require('type-check')
  * Get the permissions that a multi organization user has within an organization
  * @param {String} slug Organization's slug to get permissions
  */
-function getMultiOrgUserOrganizationPermissions (logger) {
-  return (slug, permissions) => {
-    const organizationPermissions = []
-    try {
-      // For each api key environment
-      for (const apiKeyEnvironment in permissions) {
-        logger.verbose('Api key environment:', { apiKeyEnvironment })
+function getMultiOrgUserOrganizationPermissions (slug, permissions) {
+  const organizationPermissions = []
+  try {
+    // For each api key environment
+    for (const apiKeyEnvironment in permissions) {
+      this.logger.verbose('Api key environment:', { apiKeyEnvironment })
 
-        logger.verbose(
-          'Granted permissions are:',
-          permissions[apiKeyEnvironment]
-        )
+      this.logger.verbose(
+        'Granted permissions are:',
+        permissions[apiKeyEnvironment]
+      )
 
-        // If environment is a regular expression
-        if (
-          apiKeyEnvironment.startsWith('/') &&
+      // If environment is a regular expression
+      if (
+        apiKeyEnvironment.startsWith('/') &&
           apiKeyEnvironment.endsWith('/')
-        ) {
-          logger.verbose('Will try to match with', { slug })
+      ) {
+        this.logger.verbose('Will try to match with', { slug })
 
-          // If matchs with organization slug, push permissions (will match /.*/ with any or no organization)
-          if (slug.match(new RegExp(apiKeyEnvironment.slice(1, -1), 'g'))) {
-            logger.verbose("It's a match! Pushing permissions")
+        // If matchs with organization slug, push permissions (will match /.*/ with any or no organization)
+        if (slug.match(new RegExp(apiKeyEnvironment.slice(1, -1), 'g'))) {
+          this.logger.verbose("It's a match! Pushing permissions")
 
-            organizationPermissions.push(...permissions[apiKeyEnvironment])
-          }
-        } else {
-          logger.verbose('Will try to compare with', { slug })
+          organizationPermissions.push(...permissions[apiKeyEnvironment])
+        }
+      } else {
+        this.logger.verbose('Will try to compare with', { slug })
 
-          // If it's a simple string, and is equal to the organization slug, push permissions
-          if (apiKeyEnvironment === slug) {
-            logger.verbose('Sucess! Pushing permissions', { slug })
+        // If it's a simple string, and is equal to the organization slug, push permissions
+        if (apiKeyEnvironment === slug) {
+          this.logger.verbose('Sucess! Pushing permissions', { slug })
 
-            organizationPermissions.push(...permissions[apiKeyEnvironment])
-          }
+          organizationPermissions.push(...permissions[apiKeyEnvironment])
         }
       }
-    } catch (err) {
-      logger.error(err)
     }
-
-    return organizationPermissions
+  } catch (err) {
+    this.logger.error(err)
   }
+
+  return organizationPermissions
 }
 
 /**
@@ -64,79 +62,74 @@ function getMultiOrgUserOrganizationPermissions (logger) {
 
 /**
  * Permission middleware factory
- * @param {*} logger
+ * @param {ValidatorsOrValidatorsGenerator} validatorsOrFunction
  * @returns {import('./quotiauth').Middleware} A middleware that checks if the user in req.user has the permissions
  * to continue the request to the next handler.
  */
-function validateSomePermissionClusterMiddleware (logger) {
-  /**
-   * @param {ValidatorsOrValidatorsGenerator} validatorsOrFunction
-   */
-  return (validatorsOrFunction = []) => {
-    const validatorsOrFunctionType = typeof validatorsOrFunction
-    if (
-      validatorsOrFunctionType !== 'function' &&
+function validateSomePermissionClusterMiddleware (validatorsOrFunction = []) {
+  const validatorsOrFunctionType = typeof validatorsOrFunction
+  if (
+    validatorsOrFunctionType !== 'function' &&
       typeCheck('[[String | RegExp]]', validatorsOrFunction) === false
-    ) {
-      const error = new Error(
+  ) {
+    const error = new Error(
         `Invalid permissions argument type (${validatorsOrFunctionType}) should be (string | RegExp)[][], a function that returns (string | RegExp)[][] or undefined`
-      )
-      throw error
-    }
-    return (req, res, next) => {
-      if (!req.user) {
-        if (next) {
-          next()
-        }
-        return null
+    )
+    throw error
+  }
+  return (req, res, next) => {
+    if (!req.user) {
+      if (next) {
+        next()
       }
+      return null
+    }
 
-      const validators =
+    const validators =
         validatorsOrFunctionType === 'function'
           ? validatorsOrFunction(req)
           : validatorsOrFunction
 
-      if (typeCheck('[[String | RegExp]]', validators) === false) {
-        const error = new Error(
+    if (typeCheck('[[String | RegExp]]', validators) === false) {
+      const error = new Error(
           `Invalid permissions argument type (${typeof validators}): should be either (RegExp | string)[][], a function that returns (RegExp | string)[][] or undefined.`
-        )
-        next(error)
-        return false
-      }
-
-      // Pass test if no permission is required
-      if (validators.length === 0) {
-        logger.debug('User passed permission test')
-        if (next) {
-          next()
-        }
-        return true
-      }
-      const validatedPermissions = validateSomePermissionCluster(logger)(
-        validators,
-        req.user,
-        req.params.orgSlug || '',
-        !!req.get('ApiKey')
       )
+      next(error)
+      return false
+    }
 
-      // If some validator was validated, pass test
-      if (validatedPermissions.length > 0) {
-        req.permissions = {
-          validated: validatedPermissions
-        }
-        if (next) {
-          next()
-        }
-        return true
-      } else {
-        const error = new Error(
+    // Pass test if no permission is required
+    if (validators.length === 0) {
+      this.logger.debug('User passed permission test')
+      if (next) {
+        next()
+      }
+      return true
+    }
+    const validatedPermissions = validateSomePermissionCluster(logger)(
+      validators,
+      req.user,
+      req.params.orgSlug || '',
+      !!req.get('ApiKey')
+    )
+
+    // If some validator was validated, pass test
+    if (validatedPermissions.length > 0) {
+      req.permissions = {
+        validated: validatedPermissions
+      }
+      if (next) {
+        next()
+      }
+      return true
+    } else {
+      const error = new Error(
           `Insufficient permissions! Permissions ${validators.join(
             ', '
           )} are required`
-        )
-        logger.error(error)
-        return res.status(403).send(error)
-      }
+      )
+      this.logger.error(error)
+      return res.status(403).send(error)
     }
   }
 }
@@ -174,63 +167,61 @@ function validateSomePermissionClusterMiddleware (logger) {
  * @param {*} logger
  * @returns {PermissionClusterValidatorFunction}
  */
-function validateSomePermissionCluster (logger) {
-  return (validators = [], user, orgSlug = '', usingApiKey = false) => {
-    // If auth method is api key
-    if (usingApiKey) {
-      const apiKeyPermissions = getMultiOrgUserOrganizationPermissions(logger)(
-        orgSlug,
-        user.permissions
+function validateSomePermissionCluster (validators = [], user, orgSlug = '', usingApiKey = false) {
+  // If auth method is api key
+  if (usingApiKey) {
+    const apiKeyPermissions = getMultiOrgUserOrganizationPermissions.call(this,
+      orgSlug,
+      user.permissions
+    )
+
+    // Push api key permissions to user permissions
+    if (user.Permissions) {
+      user.Permissions.push(...apiKeyPermissions)
+    } else {
+      user.Permissions = apiKeyPermissions
+    }
+  }
+
+  const userPermissions = uniqBy(user.Permissions, 'name')
+  const validatedPermissions = []
+
+  for (const validator of validators) {
+    if (validator instanceof Array) {
+      // Get the intersection between users permissions and validator permissions
+      const intersection = userPermissions.filter(userPermission =>
+        validator.includes(userPermission.name)
       )
 
-      // Push api key permissions to user permissions
-      if (user.Permissions) {
-        user.Permissions.push(...apiKeyPermissions)
-      } else {
-        user.Permissions = apiKeyPermissions
+      // If the intersection is the validator itself, then the user has all the validator's permissions
+      if (intersection.length === validator.length) {
+        validatedPermissions.push({
+          by: 'intersection',
+          intersection
+        })
       }
-    }
+    } else if (validator instanceof RegExp) {
+      // Try to match the user permissions with the validator
+      const match = []
 
-    const userPermissions = uniqBy(user.Permissions, 'name')
-    const validatedPermissions = []
-
-    for (const validator of validators) {
-      if (validator instanceof Array) {
-        // Get the intersection between users permissions and validator permissions
-        const intersection = userPermissions.filter(userPermission =>
-          validator.includes(userPermission.name)
-        )
-
-        // If the intersection is the validator itself, then the user has all the validator's permissions
-        if (intersection.length === validator.length) {
-          validatedPermissions.push({
-            by: 'intersection',
-            intersection
-          })
-        }
-      } else if (validator instanceof RegExp) {
-        // Try to match the user permissions with the validator
-        const match = []
-
-        for (const userPermission of userPermissions) {
-          if (validator.test(userPermission.name)) {
-            match.push(userPermission)
-          }
-        }
-
-        // If some permission is validated, then the user matches the validator
-        if (match.length > 0) {
-          validatedPermissions.push({
-            by: 'expression',
-            expression: validator,
-            match
-          })
+      for (const userPermission of userPermissions) {
+        if (validator.test(userPermission.name)) {
+          match.push(userPermission)
         }
       }
-    }
 
-    return validatedPermissions
+      // If some permission is validated, then the user matches the validator
+      if (match.length > 0) {
+        validatedPermissions.push({
+          by: 'expression',
+          expression: validator,
+          match
+        })
+      }
+    }
   }
+
+  return validatedPermissions
 }
 
 module.exports = {
