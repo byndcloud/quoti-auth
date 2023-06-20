@@ -106,7 +106,8 @@ function validateSomePermissionClusterMiddleware (validatorsOrFunction = []) {
       }
       return true
     }
-    const validatedPermissions = validateSomePermissionCluster(logger)(
+
+    const validatedPermissions = validateSomePermissionCluster.call(this,
       validators,
       req.user,
       req.params.orgSlug || '',
