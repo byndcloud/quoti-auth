@@ -2,8 +2,14 @@ const axios = require('axios')
 const Permissions = require('./permissions')
 const axiosBetterStackTrace = require('axios-better-stacktrace').default
 const AxiosError = require('axios-error')
+const axiosRetry = require('axios-retry')
 
 axiosBetterStackTrace(axios)
+axiosRetry(axios, {
+  retries: 5,
+  retryCondition: () => axiosRetry.isRetryableError,
+  retryDelay: axiosRetry.exponentialDelay
+})
 
 /**
  * @callback Middleware
@@ -62,13 +68,15 @@ class QuotiAuth {
   }
 
   getMultiOrgUserOrganizationPermissions (...args) {
-    return Permissions.getMultiOrgUserOrganizationPermissions.call(this,
+    return Permissions.getMultiOrgUserOrganizationPermissions.call(
+      this,
       ...args
     )
   }
 
   validateSomePermissionCluster (...args) {
-    return Permissions.validateSomePermissionClusterMiddleware.call(this,
+    return Permissions.validateSomePermissionClusterMiddleware.call(
+      this,
       ...args
     )
   }
