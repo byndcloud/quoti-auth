@@ -60,7 +60,13 @@ class QuotiAuth {
    * @param {Object} [params.logger] - Winston logger
    * @param {String} [params.errorLogLevel] - Winston log level
    */
-  setup({ orgSlug, apiKey, getUserData, logger, errorLogLevel = 'error' } = {}) {
+  setup({
+    orgSlug,
+    apiKey,
+    getUserData,
+    logger,
+    errorLogLevel = 'error'
+  } = {}) {
     this.orgSlug = orgSlug
     this.apiKey = apiKey
     this.logger = logger || console
@@ -69,7 +75,7 @@ class QuotiAuth {
       this.getUserData = getUserData
     }
 
-    validateLogLevel(errorLogLevel)
+    validateLogLevel({ logger: this.logger, logLevel: this.errorLogLevel })
   }
 
   getMultiOrgUserOrganizationPermissions(...args) {
