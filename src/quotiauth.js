@@ -1,10 +1,10 @@
 const axios = require('axios')
 const Permissions = require('./permissions')
-const axiosBetterStackTrace = require('axios-better-stacktrace').default
-const AxiosError = require('axios-error')
+const { parseAxiosError, validateLogLevel } = require('./utils/logger')
 const axiosRetry = require('axios-retry')
 
-axiosBetterStackTrace(axios)
+const logModule = '[quoti-auth]'
+
 axiosRetry(axios, {
   retries: 5,
   retryCondition: () => axiosRetry.isRetryableError,
@@ -25,9 +25,10 @@ class QuotiAuth {
    * @param {String} apiKey - Quoti API key
    * @param {Function} [getUserData] - function that returns user data
    * @param {Object} [logger] - Winston logger
+   * @param {String} [errorLogLevel] - Winston log level
    */
-  constructor (orgSlug, apiKey, getUserData, logger) {
-    this.setup({ orgSlug, apiKey, getUserData, logger })
+  constructor(orgSlug, apiKey, getUserData, logger, errorLogLevel) {
+    this.setup({ orgSlug, apiKey, getUserData, logger, errorLogLevel })
   }
 
   /**
@@ -36,7 +37,7 @@ class QuotiAuth {
    * @param {string} param0.orgSlug
    * @returns {Promise<import('../types/user').UserData | string>}
    */
-  async getUserData ({ token, orgSlug }) {
+  async getUserData({ token, orgSlug }) {
     const url = 'https://api.quoti.cloud/api/v1/'
     const headers = {
       ApiKey: this.apiKey
@@ -57,24 +58,28 @@ class QuotiAuth {
    * @param {String} params.apiKey - Quoti API key
    * @param {Function} [params.getUserData] - function that returns user data
    * @param {Object} [params.logger] - Winston logger
+   * @param {String} [params.errorLogLevel] - Winston log level
    */
-  setup ({ orgSlug, apiKey, getUserData, logger }) {
+  setup({ orgSlug, apiKey, getUserData, logger, errorLogLevel = 'error' } = {}) {
     this.orgSlug = orgSlug
     this.apiKey = apiKey
     this.logger = logger || console
+    this.errorLogLevel = errorLogLevel
     if (getUserData) {
       this.getUserData = getUserData
     }
+
+    validateLogLevel(errorLogLevel)
   }
 
-  getMultiOrgUserOrganizationPermissions (...args) {
+  getMultiOrgUserOrganizationPermissions(...args) {
     return Permissions.getMultiOrgUserOrganizationPermissions.call(
       this,
       ...args
     )
   }
 
-  validateSomePermissionCluster (...args) {
+  validateSomePermissionCluster(...args) {
     return Permissions.validateSomePermissionClusterMiddleware.call(
       this,
       ...args
@@ -86,7 +91,7 @@ class QuotiAuth {
    * @param {import('./permissions').Validators} permissions
    * @returns {Middleware}
    */
-  middleware (permissions = null) {
+  middleware(permissions = null) {
     return async (req, res, next) => {
       try {
         let token = req?.body?.token
@@ -117,7 +122,8 @@ class QuotiAuth {
 
         next()
       } catch (err) {
-        this.logger.error(err.stack)
+        this.logger[this.errorLogLevel](`${logModule}`, parseAxiosError(err))
+
         if (res.headersSent) {
           return
         }
@@ -140,10 +146,11 @@ class QuotiAuth {
           code = 403
         } else if (errorMessage?.includes?.('Invalid recaptcha token')) {
           code = 401
-          this.logger.error('Axios error', new AxiosError(err))
         }
+
         res.status(code).send(err?.response?.data || errorMessage)
       }
+
       return null
     }
   }
