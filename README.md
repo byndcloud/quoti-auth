@@ -64,7 +64,8 @@ quotiAuth.setup({
     orgSlug: 'someOrgSlug',
     apiKey: 'some-api-key',
     getUserData: getUserData,
-    logger: console 
+    logger: console,
+    errorLogLevel: 'error'
 })
 ```
 
