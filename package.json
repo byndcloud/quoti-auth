@@ -5,7 +5,7 @@
   "main": "src/quotiauth.js",
   "types": "types/quotiauth.d.ts",
   "scripts": {
-    "test": "run(){ NODE_ENV=test mocha --inspect \"./test/index.spec.mjs\"; }; run"
+    "test": "run(){ NODE_ENV=test mocha --inspect \"./e2e/index.spec.mjs\"; }; run"
   },
   "repository": {
     "type": "git",
@@ -23,7 +23,7 @@
   "homepage": "https://github.com/byndcloud/quoti-auth#readme",
   "dependencies": {
     "axios": "^1.6.8",
-    "axios-retry": "^3.5.1",
+    "axios-retry": "^3.9.1",
     "lodash": "^4.17.21",
     "type-check": "^0.4.0"
   },
