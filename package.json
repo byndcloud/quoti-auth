@@ -1,7 +1,7 @@
 {
   "name": "quoti-auth",
-  "version": "1.8.4-0",
-  "description": "",
+  "version": "1.9.0",
+  "description": "library that helps you implement Quoti's Authentication and Authorization APIs in your project",
   "main": "src/quotiauth.js",
   "types": "types/quotiauth.d.ts",
   "scripts": {
