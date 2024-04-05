@@ -1,3 +1,4 @@
+const { flattenDeep } = require('lodash')
 const axios = require('axios')
 const Permissions = require('./permissions')
 const { parseAxiosError, validateLogLevel } = require('./utils/logger')
@@ -38,7 +39,7 @@ class QuotiAuth {
    * @param {string} param0.orgSlug
    * @returns {Promise<import('../types/user').UserData | string>}
    */
-  async getUserData ({ token, orgSlug }) {
+  async getUserData ({ token, orgSlug, specificPermissions }) {
     const url = 'https://api.quoti.cloud/api/v1/'
     const headers = {
       ApiKey: this.apiKey
@@ -46,7 +47,7 @@ class QuotiAuth {
 
     const { data } = await axios.post(
       `${url}${orgSlug || this.orgSlug}/auth/login/getuser`,
-      { token },
+      { token, specificPermissions },
       { headers }
     )
     return data
@@ -113,10 +114,16 @@ class QuotiAuth {
           throw new Error('Missing authentication')
         }
 
+        const flattenedPermissions = Array.isArray(permissions)
+          ? flattenDeep(permissions)
+          : undefined
+
         const result = await this.getUserData({
           token,
-          orgSlug: req.params.orgSlug || this.orgSlug
+          orgSlug: req.params.orgSlug || this.orgSlug,
+          specificPermissions: flattenedPermissions
         })
+
         req.user = result
         if (permissions) {
           const permissionsResult = this.validateSomePermissionCluster(
