@@ -29,7 +29,7 @@ class QuotiAuth {
    * @param {Object} [logger] - Winston logger
    * @param {String} [errorLogLevel] - Winston log level
    */
-  constructor(orgSlug, apiKey, getUserData, logger, errorLogLevel) {
+  constructor (orgSlug, apiKey, getUserData, logger, errorLogLevel) {
     this.setup({ orgSlug, apiKey, getUserData, logger, errorLogLevel })
   }
 
@@ -39,7 +39,7 @@ class QuotiAuth {
    * @param {string} param0.orgSlug
    * @returns {Promise<import('../types/user').UserData | string>}
    */
-  async getUserData({ token, orgSlug, includePermissions }) {
+  async getUserData ({ token, orgSlug, includePermissions }) {
     const url = 'https://api.quoti.cloud/api/v1/'
     const headers = {
       ApiKey: this.apiKey
@@ -62,7 +62,7 @@ class QuotiAuth {
    * @param {Object} [params.logger] - Winston logger
    * @param {String} [params.errorLogLevel] - Winston log level
    */
-  setup({
+  setup ({
     orgSlug,
     apiKey,
     getUserData,
@@ -80,14 +80,14 @@ class QuotiAuth {
     validateLogLevel({ logger: this.logger, logLevel: this.errorLogLevel })
   }
 
-  getMultiOrgUserOrganizationPermissions(...args) {
+  getMultiOrgUserOrganizationPermissions (...args) {
     return Permissions.getMultiOrgUserOrganizationPermissions.call(
       this,
       ...args
     )
   }
 
-  validateSomePermissionCluster(...args) {
+  validateSomePermissionCluster (...args) {
     return Permissions.validateSomePermissionClusterMiddleware.call(
       this,
       ...args
@@ -99,7 +99,7 @@ class QuotiAuth {
    * @param {import('./permissions').Validators} permissions
    * @returns {Middleware}
    */
-  middleware(permissions = null) {
+  middleware (permissions = null) {
     return async (req, res, next) => {
       try {
         let token = req?.body?.token
