@@ -43,9 +43,14 @@ class QuotiAuth {
     const headers = {
       ApiKey: this.apiKey
     }
-    includePermissions = encodeURIComponent(JSON.stringify(includePermissions))
+
+    const stringJSON = JSON.stringify(includePermissions)
+    const urlEncondedPermissions = encodeURIComponent(stringJSON)
+
     const { data } = await axios.post(
-      `${url}${orgSlug || this.orgSlug}/auth/login/getuser?includePermissions=${includePermissions}`,
+      `${url}${
+        orgSlug || this.orgSlug
+      }/auth/login/getuser?includePermissions=${urlEncondedPermissions}`,
       { token },
       { headers }
     )
