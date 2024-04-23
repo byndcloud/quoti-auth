@@ -38,15 +38,20 @@ class QuotiAuth {
    * @param {string} param0.orgSlug
    * @returns {Promise<import('../types/user').UserData | string>}
    */
-  async getUserData ({ token, orgSlug, specificPermissions }) {
+  async getUserData ({ token, orgSlug, includePermissions }) {
     const url = 'https://api.quoti.cloud/api/v1/'
     const headers = {
       ApiKey: this.apiKey
     }
 
+    const stringJSON = JSON.stringify(includePermissions)
+    const urlEncondedPermissions = encodeURIComponent(stringJSON)
+
     const { data } = await axios.post(
-      `${url}${orgSlug || this.orgSlug}/auth/login/getuser`,
-      { token, specificPermissions },
+      `${url}${
+        orgSlug || this.orgSlug
+      }/auth/login/getuser?includePermissions=${urlEncondedPermissions}`,
+      { token },
       { headers }
     )
     return data
@@ -113,18 +118,21 @@ class QuotiAuth {
           throw new Error('Missing authentication')
         }
 
-        const flattenedPermissions = Array.isArray(permissions)
-          ? flattenDeep(permissions)
-          : undefined
+        let includePermissions = true
+
+        if (permissions && Array.isArray(permissions)) {
+          includePermissions =
+            permissions.length !== 0 ? flattenDeep(permissions) : false
+        }
 
         const result = await this.getUserData({
           token,
           orgSlug: req.params.orgSlug || this.orgSlug,
-          specificPermissions: flattenedPermissions
+          includePermissions
         })
 
         req.user = result
-        if (permissions) {
+        if (permissions && permissions.length) {
           const permissionsResult = this.validateSomePermissionCluster(
             permissions
           )(req, res)
