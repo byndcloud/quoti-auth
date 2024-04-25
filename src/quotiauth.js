@@ -123,6 +123,18 @@ class QuotiAuth {
         if (permissions && Array.isArray(permissions)) {
           includePermissions =
             permissions.length !== 0 ? flattenDeep(permissions) : false
+        } else if (permissions && typeof permissions === 'object') {
+          const { permissionsToFetch, permissionsToValidate } = permissions
+          includePermissions = []
+          if (permissionsToFetch) {
+            includePermissions = includePermissions.concat(flattenDeep(permissionsToFetch))
+          }
+          if (permissionsToValidate) {
+            includePermissions = includePermissions.concat(flattenDeep(permissionsToValidate))
+          }
+          if (includePermissions.length === 0) {
+            includePermissions = false
+          }
         }
 
         const result = await this.getUserData({
@@ -135,6 +147,13 @@ class QuotiAuth {
         if (permissions && permissions.length) {
           const permissionsResult = this.validateSomePermissionCluster(
             permissions
+          )(req, res)
+          if (!permissionsResult) {
+            throw new Error('Insufficient permissions or user is null')
+          }
+        } else if (permissions && permissions.permissionsToValidate && permissions.permissionsToValidate.length) {
+          const permissionsResult = this.validateSomePermissionCluster(
+            permissions.permissionsToValidate
           )(req, res)
           if (!permissionsResult) {
             throw new Error('Insufficient permissions or user is null')
