@@ -134,8 +134,8 @@ class QuotiAuth {
         }
 
         if (permissionsArray) {
-          const flattendPermissionArray = flattenDeep(permissionsArray)
-          includePermissions = flattendPermissionArray?.length !== 0 ? flattendPermissionArray : false
+          const flattenedPermissionArray = flattenDeep(permissionsArray)
+          includePermissions = flattenedPermissionArray?.length !== 0 ? flattenedPermissionArray : false
         }
 
         const result = await this.getUserData({
