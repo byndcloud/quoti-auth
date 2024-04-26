@@ -122,12 +122,11 @@ class QuotiAuth {
         let includePermissions = true
         let permissionsArray = permissions
 
-        if (
-          permissions &&
-          !Array.isArray(permissions)
-        ) {
+        if (permissions && !Array.isArray(permissions)) {
           if (typeof permissions !== 'object') {
-            throw new Error('Invalid permissions argument. Must be an object or an array of strings.')
+            throw new Error(
+              'Invalid permissions argument. Must be an object or an array of strings.'
+            )
           }
 
           const { permissionsToFetch, permissionsToValidate } = permissions
@@ -139,7 +138,10 @@ class QuotiAuth {
 
         if (permissionsArray) {
           const flattenedPermissionArray = flattenDeep(permissionsArray)
-          includePermissions = flattenedPermissionArray?.length !== 0 ? flattenedPermissionArray : false
+          includePermissions =
+            flattenedPermissionArray?.length !== 0
+              ? flattenedPermissionArray
+              : false
         }
 
         const result = await this.getUserData({
@@ -149,7 +151,8 @@ class QuotiAuth {
         })
 
         req.user = result
-        const permissionsToValidate = permissions?.permissionsToValidate || permissions
+        const permissionsToValidate =
+          permissions?.permissionsToValidate || permissions
 
         if (permissionsToValidate && permissionsToValidate.length) {
           const permissionsResult = this.validateSomePermissionCluster(
