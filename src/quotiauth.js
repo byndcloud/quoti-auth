@@ -151,10 +151,11 @@ class QuotiAuth {
         })
 
         req.user = result
-        const permissionsToValidate =
-          permissions?.permissionsToValidate || permissions
+        const permissionsToValidate = Array.isArray(permissions)
+          ? permissions
+          : permissions?.permissionsToValidate
 
-        if (permissionsToValidate && permissionsToValidate.length) {
+        if (permissionsToValidate && permissionsToValidate?.length) {
           const permissionsResult = this.validateSomePermissionCluster(
             permissionsToValidate
           )(req, res)
