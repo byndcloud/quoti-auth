@@ -104,7 +104,7 @@ class QuotiAuth {
    * @param {import('./permissions').Validators} permissions
    * @returns {Middleware}
    */
-  middleware (permissionsParam = null) {
+  middleware (permissions = null) {
     return async (req, res, next) => {
       try {
         let token = req?.body?.token
@@ -120,14 +120,17 @@ class QuotiAuth {
         }
 
         let includePermissions = true
-        let permissionsArray = permissionsParam
+        let permissionsArray = permissions
 
         if (
-          permissionsParam &&
-          !Array.isArray(permissionsParam) &&
-          typeof permissionsParam === 'object'
+          permissions &&
+          !Array.isArray(permissions)
         ) {
-          const { permissionsToFetch, permissionsToValidate } = permissionsParam
+          if (typeof permissions !== 'object') {
+            throw new Error('Invalid permissions argument. Must be an object or an array of strings.')
+          }
+
+          const { permissionsToFetch, permissionsToValidate } = permissions
           permissionsArray = []
           permissionsArray = permissionsArray
             .concat(permissionsToFetch || [])
@@ -146,7 +149,7 @@ class QuotiAuth {
         })
 
         req.user = result
-        const permissionsToValidate = permissionsParam?.permissionsToValidate || permissionsParam
+        const permissionsToValidate = permissions?.permissionsToValidate || permissions
 
         if (permissionsToValidate && permissionsToValidate.length) {
           const permissionsResult = this.validateSomePermissionCluster(
