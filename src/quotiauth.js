@@ -103,7 +103,7 @@ class QuotiAuth {
    * @param {import('./permissions').Validators} permissions
    * @returns {Middleware}
    */
-  middleware (permissions = null) {
+  middleware (permissionsParam = null) {
     return async (req, res, next) => {
       try {
         let token = req?.body?.token
@@ -119,22 +119,22 @@ class QuotiAuth {
         }
 
         let includePermissions = true
+        let permissionsArray = permissionsParam
 
-        if (permissions && Array.isArray(permissions)) {
-          includePermissions =
-            permissions.length !== 0 ? flattenDeep(permissions) : false
-        } else if (permissions && typeof permissions === 'object') {
-          const { permissionsToFetch, permissionsToValidate } = permissions
-          includePermissions = []
-          if (permissionsToFetch) {
-            includePermissions = includePermissions.concat(flattenDeep(permissionsToFetch))
-          }
-          if (permissionsToValidate) {
-            includePermissions = includePermissions.concat(flattenDeep(permissionsToValidate))
-          }
-          if (includePermissions.length === 0) {
-            includePermissions = false
-          }
+        if (
+          permissionsParam &&
+          !Array.isArray(permissionsParam) &&
+          typeof permissionsParam === 'object'
+        ) {
+          const { permissionsToFetch, permissionsToValidate } = permissionsParam
+          permissionsArray = []
+          permissionsArray = permissionsArray
+            .concat(permissionsToFetch || [])
+            .concat(permissionsToValidate || [])
+        }
+
+        if (permissionsArray) {
+          includePermissions = permissionsArray?.length !== 0 ? flattenDeep(permissionsArray) : false
         }
 
         const result = await this.getUserData({
@@ -144,16 +144,11 @@ class QuotiAuth {
         })
 
         req.user = result
-        if (permissions && permissions.length) {
+        const permissionsToValidate = permissionsParam?.permissionsToValidate || permissionsParam
+
+        if (permissionsToValidate && permissionsToValidate.length) {
           const permissionsResult = this.validateSomePermissionCluster(
-            permissions
-          )(req, res)
-          if (!permissionsResult) {
-            throw new Error('Insufficient permissions or user is null')
-          }
-        } else if (permissions && permissions.permissionsToValidate && permissions.permissionsToValidate.length) {
-          const permissionsResult = this.validateSomePermissionCluster(
-            permissions.permissionsToValidate
+            permissionsToValidate
           )(req, res)
           if (!permissionsResult) {
             throw new Error('Insufficient permissions or user is null')
