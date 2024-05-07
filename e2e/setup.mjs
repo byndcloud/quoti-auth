@@ -4,7 +4,7 @@ import chaiHttp from 'chai-http'
 chai.use(chaiHttp)
 
 export const mochaHooks = {
-  afterAll() {
+  afterAll () {
     console.info('Finished execution of e2e tests')
     process.exit(0)
   }
