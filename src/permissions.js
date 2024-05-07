@@ -79,9 +79,7 @@ function validateSomePermissionClusterMiddleware (validatorsOrFunction = []) {
   }
   return (req, res, next) => {
     if (!req.user) {
-      if (next) {
-        next()
-      }
+      next?.()
       return null
     }
 
@@ -94,16 +92,14 @@ function validateSomePermissionClusterMiddleware (validatorsOrFunction = []) {
       const error = new Error(
           `Invalid permissions argument type (${typeof validators}): should be either (RegExp | string)[][], a function that returns (RegExp | string)[][] or undefined.`
       )
-      next(error)
+      next?.(error)
       return false
     }
 
     // Pass test if no permission is required
     if (validators.length === 0) {
       this.logger.debug('User passed permission test')
-      if (next) {
-        next()
-      }
+      next?.()
       return true
     }
 
@@ -119,9 +115,7 @@ function validateSomePermissionClusterMiddleware (validatorsOrFunction = []) {
       req.permissions = {
         validated: validatedPermissions
       }
-      if (next) {
-        next()
-      }
+      next?.()
       return true
     } else {
       const error = new Error(
