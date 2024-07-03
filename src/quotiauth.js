@@ -1,3 +1,4 @@
+const { flattenDeep } = require('lodash')
 const axios = require('axios')
 const Permissions = require('./permissions')
 const { parseAxiosError, validateLogLevel } = require('./utils/logger')
@@ -38,14 +39,19 @@ class QuotiAuth {
    * @param {string} param0.orgSlug
    * @returns {Promise<import('../types/user').UserData | string>}
    */
-  async getUserData ({ token, orgSlug }) {
+  async getUserData ({ token, orgSlug, includePermissions }) {
     const url = 'https://api.quoti.cloud/api/v1/'
     const headers = {
       ApiKey: this.apiKey
     }
 
+    const stringJSON = JSON.stringify(includePermissions)
+    const urlEncondedPermissions = encodeURIComponent(stringJSON)
+
     const { data } = await axios.post(
-      `${url}${orgSlug || this.orgSlug}/auth/login/getuser`,
+      `${url}${
+        orgSlug || this.orgSlug
+      }/auth/login/getuser?includePermissions=${urlEncondedPermissions}`,
       { token },
       { headers }
     )
@@ -113,19 +119,57 @@ class QuotiAuth {
           throw new Error('Missing authentication')
         }
 
+        let includePermissions = true
+        let permissionsArray = permissions
+
+        if (permissions && !Array.isArray(permissions)) {
+          if (typeof permissions !== 'object') {
+            throw new Error(
+              'Invalid permissions argument. Must be an object or an array of strings.'
+            )
+          }
+
+          const { permissionsToFetch, permissionsToValidate } = permissions
+          permissionsArray = []
+          permissionsArray = permissionsArray
+            .concat(permissionsToFetch || [])
+            .concat(permissionsToValidate || [])
+        }
+
+        if (permissionsArray) {
+          const flattenedPermissionArray = flattenDeep(permissionsArray)
+          includePermissions =
+            flattenedPermissionArray?.length !== 0
+              ? flattenedPermissionArray
+              : false
+        }
+
         const result = await this.getUserData({
           token,
-          orgSlug: req.params.orgSlug || this.orgSlug
+          orgSlug: req.params.orgSlug || this.orgSlug,
+          includePermissions
         })
+
         req.user = result
-        if (permissions) {
+        const permissionsToValidate = Array.isArray(permissions)
+          ? permissions
+          : permissions?.permissionsToValidate
+
+        if (permissionsToValidate && permissionsToValidate?.length) {
           const permissionsResult = this.validateSomePermissionCluster(
-            permissions
+            permissionsToValidate
           )(req, res)
           if (
             !permissionsResult ||
             isErrorStatusCode(permissionsResult?.statusCode)
           ) {
+            throw new Error('Insufficient permissions or user is null')
+          }
+        } else if (permissionsToValidate?.length) {
+          const permissionsResult = this.validateSomePermissionCluster(
+            permissionsToValidate
+          )(req, res)
+          if (!permissionsResult) {
             throw new Error('Insufficient permissions or user is null')
           }
         }
