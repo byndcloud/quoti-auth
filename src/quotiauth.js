@@ -1,16 +1,8 @@
-const axios = require('axios')
+const axios = require('./utils/axios')
 const Permissions = require('./permissions')
 const { parseAxiosError, validateLogLevel } = require('./utils/logger')
-const axiosRetry = require('axios-retry')
-const { isErrorStatusCode } = require('./utils/error')
 
 const logModule = '[quoti-auth]'
-
-axiosRetry(axios, {
-  retries: 5,
-  retryCondition: () => axiosRetry.isRetryableError,
-  retryDelay: axiosRetry.exponentialDelay
-})
 
 /**
  * @callback Middleware
