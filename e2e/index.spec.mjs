@@ -16,13 +16,13 @@ describe('QuotiAuth - no token tests', function () {
     expect(res.status).to.equal(200)
   })
 
-  it('Should call a endpoint with QuotiAuthMiddleware', async function () {
+  it('Should call a endpoint with QuotiAuthMiddleware 1', async function () {
     const res = await requester.get('/authenticated').send()
 
     expect(res.status).to.equal(401)
   })
 
-  it('Should call a endpoint with QuotiAuthMiddleware', async function () {
+  it('Should call a endpoint with QuotiAuthMiddleware 2', async function () {
     const res = await requester
       .get('/authenticated')
       .set('Authentication', 'Bearer InvalidToken')
@@ -42,7 +42,7 @@ describe('QuotiAuth - token BearerStatic', function () {
     expect(res.status).to.equal(200)
   })
 
-  it('Should call a endpoint with QuotiAuthMiddleware', async function () {
+  it('Should call a endpoint with QuotiAuthMiddleware 3', async function () {
     const res = await requester
       .get('/authenticated')
       .set('BearerStatic', bearerStatic)
@@ -51,7 +51,7 @@ describe('QuotiAuth - token BearerStatic', function () {
     expect(res.status).to.equal(401)
   })
 
-  it('Should call a endpoint with QuotiAuthMiddleware', async function () {
+  it('Should call a endpoint with QuotiAuthMiddleware 4', async function () {
     const res = await requester
       .get('/authenticated')
       .set('BearerStatic', bearerStatic)
